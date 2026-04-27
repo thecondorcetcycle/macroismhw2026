@@ -1,0 +1,12 @@
+%% setting the model up
+%produce a structure at the given calibration values
+par.b = 50;
+par.psi = 1;
+par.delta = 0.2/12;
+par.beta = 0.995;
+par.mu = 100; %mean of F(w)
+par.sigma = 25; %standard deviation of F(w)
+
+%% calculating the values of \gamma_{gg}
+d = [10*12, 25*12, 5*12]; %avg. age duration vector
+gamma = (d - 1) ./ d; %vector of \gamma_{gg}

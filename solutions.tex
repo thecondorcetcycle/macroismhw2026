@@ -1,0 +1,567 @@
+\documentclass{article}
+\usepackage{amsmath} %for align, etc.
+\usepackage{amssymb} %for \mathbb, \mathcal, etc.
+\usepackage{comment} %to comment out some stuff we might use later instead
+\newcommand{\lbar}[1]{\underline{#1}} %easier way to write lower bar
+\DeclareMathOperator\supp{supp} %support function
+
+\begin{document}
+\textit{To solve this problem, we first make the assumption that all young workers initially join the labour-force unemployed. We also assume that unemployed workers who search can only accept their offer in the next period.}
+
+\section{A General Analytic Solution}
+\smallskip
+Since old workers leave the labour-force upon retirement, this amounts to all workers facing the following age transition matrix:\footnote{We have opted to replace all $\pi$s in the age transition probabilities with $\gamma$s so as to keep this notationally distinct from the endogenous job finding probability $\pi(a)$}
+\[
+\Gamma = \begin{bmatrix}
+    \gamma_{jj} & 1-\gamma_{jj} & 0 \\
+    0 & \gamma_{mm} & 1-\gamma_{mm} \\
+    0 & 0 & \gamma_{ss}
+\end{bmatrix}
+\]
+In effect, in each period of their existence, senior workers exit the labour-force with a probability of $1-\gamma_{ss}$. As we will see later, this places heterogeneous incentives on the search effort of unemployed workers throughout their life cycle.
+
+Let $V_{l,g}$ denote the value function of a worker who is of employment status $l\in\{e,u\}$ (employed or unemployed), and age $g\in\{j,m,s\}$ (young, middle-aged, or senior).\footnote{Note that we have opted to use $g$ to index age, to prevent any possible future confusion with the senior age $s$, accordingly, we have also used $\delta$ for the exogenous separation/job destruction rate.} At each period, a worker faces a stochastic infinite horizon problem, where each subsequent period they experience a probability of aging up (or leaving the labour-force if senior), and changing employment status. Hence, we write the representative Bellman equations as follows, for all ages $g\in\{j,m,s\}$:
+\begin{align}
+V_{e,g}(w)
+&=
+w+\beta\sum_{g'}\Gamma(g'\mid g)
+\Bigl[
+(1-\delta)V_{e,g'}(w)+\delta V_{u,g'}
+\Bigr],
+\tag{W}\label{eq:bell_w}
+\\
+V_{u,g}
+&= \max_{a_g \ge 0} \Biggl\{
+b - \psi a_g + \beta \sum_{g'} \Gamma(g' \mid g)
+\Bigl[
+(1 - \pi(a_g)) V_{u,g'} \tag{U}~\label{eq:bell_u}\\
+&\qquad\qquad + \pi(a_g)\, \mathbb{E}_w \bigl[\max\{V_{u,g'}, V_{e,g'}(w)\}\bigr]
+\Bigr]
+\Biggr\} \notag
+\end{align}
+Here, we let $g$ refer to the age of worker in their present period, and $g'$ to their age in their next period. Similarly, we use $\Gamma(g'|g)$ to refer to the age transition probability to age $g'$ given they are currently at age $g$, where combining with the sum over all $g'$ gives the expected next period age. Altogether,~\eqref{eq:bell_w} and~\eqref{eq:bell_u} represent the Bellman equations for employed and unemployed workers respectively representing the present values of each state, where $V_{e,g}(w)$ takes the current wage as an argument through its role as a state variable.
+
+We pay particular attention to~\eqref{eq:bell_u}, insofar as the wage itself is drawn stochastically from $F(w)$. Hence, a worker only accepts an offer if the present value of a accepting the offer outweighs that of being unemployed, represented in the ${E}_w \bigl[\max\{V_{u,g'}, V_{e,g'}(w)\}\bigr]$ portion of the present value of being unemployed.
+
+Solving backwards from the final age cohort, we note that if a senior worker is in a given labour market state in the next period, they can only be so when senior. With this in mind, we obtain the following expression for the value of being 
+employed with a given wage $w$ when old:
+\begin{align*}
+V_{e,s}(w)&=w+\beta\gamma_{ss}\bigl[(1-\delta)V_{e,s}(w)+\delta V_{u,s}\bigr]\\
+&=\frac{w+\beta\gamma_{ss}\delta V_{u,s}}{1-\beta\gamma_{ss}(1-\delta)}
+\end{align*}
+Furthermore, we note that a senior worker will only accept a job if the net present value of accepting the job is at least as great as that of being unemployed:
+\begin{align*}
+V_{u,s}&\leq\frac{w+\beta\gamma_{ss}\delta V_{u,s}}{1-\beta\gamma_{ss}(1-\delta)}\\
+w&\geq(1-\beta\gamma_{ss})V_{u,s}
+\end{align*}
+Since $F(w)$ is continuous and has full support on $\mathbb{R}$, there exists a reservation wage $\lbar{w}_s\in\supp(F(w))$ satisfying the above expression with perfect equality, such that any wage offers below this value will not be accepted when senior. In effect, a senior worker values unemployment at:
+\begin{equation}
+V_{u,s}=\frac{\lbar{w}_s}{1-\beta\gamma_{ss}}
+~\label{eq:sen_res_unemp}
+\end{equation}
+Moreover, to compute the expected gain from accepting an offer at a given wage $w\geq\lbar{w}_s$, we can calculate the difference for senior workers between the value of unemployment and that of employment:
+\begin{align*}
+\mathbb{E}[V_{e,s}(w)-V_{u,s}|w\geq\lbar{w}_s]=\frac{\mathbb{E}[w-\lbar{w}_s|w\geq\lbar{w}_s]}{1-\beta\gamma_{ss}(1-\delta)}\\
+\mathbb{E}[V_{e,s}(w)|w\geq\lbar{w}_s]=\frac{\mathbb{E}[w-\lbar{w}_s|w\geq\lbar{w}_s]}{1-\beta\gamma_{ss}(1-\delta)}+V_{u,s}
+\end{align*}
+Substituting this identity back into the senior's Bellman equation when unemployed, we get:
+\begin{align*}
+V_{u,s}&=\max_{a_s\geq 0}\Biggl\{b-\psi a_s+\beta\gamma_{ss}\biggl[V_{u,s}+\frac{\pi(a_s)}{1-\beta\gamma_{ss}(1-\delta)}\int_{\lbar{w}_s}^\infty(w-\lbar{w}_s)dF(w)\biggr]\Biggr\}\\
+\lbar{w}_s&=\max_{a_s\geq 0}\Biggl\{b-\psi a_s+\frac{\beta\gamma_{ss}\pi(a_s)}{1-\beta\gamma_{ss}(1-\delta)}\int_{\lbar{w}_s}^\infty(w-\lbar{w}_s)dF(w)\Biggr\}\\
+\end{align*}
+where in the first line we replace the expectation term with the integral with respect to the distribution, and in the second regroup $V_{u,s}$ to the left-hand-side, and substitute for the senior reservation wage, given the identity~\eqref{eq:sen_res_unemp}.
+
+To obtain an implicit solution, we first solve for optimal senior search effort $a_s$, taking the first order condition of our expression for $\lbar{w}_s$ with respect to this, we get:
+\[
+a_s^*=\max\Biggl\{0,\frac{1}{\phi}\ln\biggl(\frac{\phi\beta\gamma_{ss}\int_{\lbar{w}_s}^\infty(w-\lbar{w}_s)dF(w)}{\psi(1-\beta\gamma_{ss}(1-\delta))}\biggr)\Biggr\},
+\]
+where an interior solution follows only if $\phi\beta\gamma_{ss}\int_{\lbar{w}_s}^\infty(w-\lbar{w}_s)dF(w)>\psi(1-\beta\gamma_{ss}(1-\delta))$, else the senior worker opts to remain unemployed throughout, and the distribution of wages for senior workers is degenerate.
+
+Since $F(w)$ is distributed normally, there is no elementary closed form for the cumulative distribution function. Nonetheless, it is clear that plugging $a_s^*$ back in will provide us with a fixed point equation, hence a there exists a solution to our equation. Moreover, note by Tonelli's theorem that:
+\[
+\int_{\lbar{w}_s}^{\infty} (w-\lbar{w}_s)dF(w)
+= \int_{\lbar{w}_s}^{\infty}\int_x^{\infty} dF(w)dx
+= \int_{\lbar{w}_s}^{\infty} \bigl(1-F(w)\bigr)dw.
+\]
+We can hence write our fixed-point equation for $\lbar{w}_s$ as:
+\begin{equation}
+\lbar{w}_s=b-\psi a_s^*+\frac{\beta\gamma_{ss}(1-e^{-\phi a_s^*})}{1-\beta\gamma_{ss}(1-\delta)}\int_{\lbar{w}_s}^{\infty} \bigl(1-F(w)\bigr)dw
+~\label{eq:ws_fixed_point}
+\end{equation}
+Intuitively, the right-hand side captures $b$ denotes the flow payoff from unemployment net of the optimal flow search effort cost $\psi a_s^*$, plus the expected wage gain from future job offers: the probability of receiving an acceptable offer, $1-e^{-\phi a_s^*}$, multiplied by the discounted expected surplus from such an offer, while the factor $\frac{\beta\gamma_{ss}}{1-\beta\gamma_{ss}(1-\delta)}$ scales this surplus by the effective duration of employment, accounting for both discounting and job destruction.
+
+\noindent It follows that, at an interior solution:
+\[
+\frac{d}{d\lbar{w}_s}\biggl(b-\psi a_s^*+\frac{\beta\gamma_{ss}(1-e^{-\phi a_s^*})}{1-\beta\gamma_{ss}(1-\delta)}\int_{\lbar{w}_s}^{\infty} \bigl(1-F(w)\bigr)dw\biggr)<0
+\]
+To see this explicitly, let us denote the right hand side of~\eqref{eq:ws_fixed_point} by $\lbar{w}_s$, which is itself a function both directly of $\lbar{w}_s$, and implicitly by $a^*_g(\lbar{w}_s)$. Thus, by the envelope theorem:
+\begin{align*}
+\frac{d\lbar{w}_s(a^*_g(\lbar{w}_s), \lbar{w}_s)}{d\lbar{w}_s}&=\frac{\partial \lbar{w}_s(a^*_g(\lbar{w}_s), \lbar{w}_s)}{\partial a^*_g(\lbar{w}_s)}\frac{\partial a^*_g(\lbar{w}_s)}{\partial \lbar{w}_s}+\frac{\partial \lbar{w}_s(a^*_g(\lbar{w}_s), \lbar{w}_s)}{\partial \lbar{w}_s}\\
+&=\frac{\partial \lbar{w}_s(a^*_g(\lbar{w}_s), \lbar{w}_s)}{\partial \lbar{w}_s}\\
+&=-\frac{\beta\gamma_{ss}(1-e^{-\phi a_s^*})}{1-\beta\gamma_{ss}(1-\delta)}\bigl(1-F(\lbar{w}_s)\bigr)<0
+\end{align*}
+Therefore, since $\lbar{w}_s$ is strictly decreasing in $\lbar{w}_s$, and the identity function is strictly increasing, it follows that the senior reservation wage is unique at the interior. At the corner solution, the reservation wage is trivially unique; with $a^*_s=0$, the identity simplifies to:
+\[
+\lbar{w}_s=b
+\]
+More importantly, this also affords us the ability to derive implicit solutions for the remaining two age cohorts. With our senior reservation wage now well defined, we proceed onto the subsequent age cohorts. In particular, for notational simplicity, let us define from our solved objects, the present-discounted transition value of being senior for an employed middle-aged worker:
+\[
+\tilde{V}_s(w)\doteq \beta(1-\gamma_{mm})\bigl((1-\delta)V_{e,s}(w)+\delta V_{u,s}\bigr)
+\]
+It follows that the middle-aged present value of being employed at wage $w$, as a function of the value of being unemployed is:
+\[
+V_{e,m}(w)=\frac{w+\beta\gamma_{mm}\delta V_{u,m}+\tilde{V}_s(w)}{1-\beta\gamma_{mm}(1-\delta)}
+\]
+Proceeding as before, we note the existence of a reservation wage satisfying:
+\begin{align*}
+\lbar{w}_m=(1-\beta\gamma_{mm})V_{u,m}-\tilde{V}_s(\lbar{w}_m)
+\end{align*}
+Hence, using this reservation wage condition, we have:
+\[
+V_{e,m}(w)-V_{u,m}=
+\frac{
+w-\lbar{w}_m+\tilde V_s(w)-\tilde V_s(\lbar{w}_m)
+}
+{1-\beta\gamma_{mm}(1-\delta)}
+\]
+In addition, using the same approach as before, solving for $\lbar{w}_m$, we get:
+\begin{align*}
+\lbar{w}_m
+=
+\max_{a_m\geq 0}
+\Biggl\{
+& b-\psi a_m
++\tilde V_s(\lbar w_s)-\tilde V_s(\lbar w_m) \\
+&\quad
++\frac{\beta\gamma_{mm}\pi(a_m)}
+{1-\beta\gamma_{mm}(1-\delta)}
+\int_{\lbar{w}_m}^{\infty}
+\Bigl[
+w-\lbar{w}_m+\tilde V_s(w)-\tilde V_s(\lbar{w}_m)
+\Bigr]\,dF(w) \\
+&\quad
++\frac{\beta(1-\gamma_{mm})\pi(a_m)}
+{1-\beta\gamma_{ss}(1-\delta)}
+\int_{\lbar{w}_s}^{\infty}
+(w-\lbar{w}_s)\,dF(w)
+\Biggr\}
+\end{align*}
+where we use the fact that $V_{e,s}(\lbar{w}_s)=V_{u,s}$. Moreover, this entails an optimal search effort of:
+\begin{align*}
+a_m^*
+=
+\max\Biggl\{
+0,\,
+\frac{1}{\phi}
+\ln\Biggl(\frac{\phi}{\psi}\biggl[
+&\frac{
+\beta\gamma_{mm}}
+{1-\beta\gamma_{mm}(1-\delta)}
+\int_{\lbar{w}_m}^{\infty}
+\Bigl[
+w-\lbar{w}_m+\tilde V_s(w)-\tilde V_s(\lbar{w}_m)
+\Bigr]\,dF(w)\\
+&\quad
++\frac{\beta(1-\gamma_{mm})}
+{1-\beta\gamma_{ss}(1-\delta)}
+\int_{\lbar{w}_s}^{\infty}
+(w-\lbar{w}_s)\,dF(w)
+\biggr]\Biggr)
+\Biggr\}.
+\end{align*}
+In particular, the last term captures within it the additional gain when senior, if a suitable wage was drawn when middle-aged:
+\begin{align*}
+\lbar w_s=b-\psi a_s^*+
+\frac{\beta\gamma_{ss}\pi(a_s^*)}
+{1-\beta\gamma_{ss}(1-\delta)}
+\int_{\lbar w_s}^{\infty}(w-\lbar w_s)\,dF(w)\\
+\frac{1}{1-\beta\gamma_{ss}(1-\delta)}
+\int_{\lbar w_s}^{\infty}(w-\lbar w_s)\,dF(w)
+=
+\frac{\lbar w_s-b+\psi a_s^*}
+{\beta\gamma_{ss}\pi(a_s^*)}.
+\end{align*}
+However, while the middle-aged worker inherits a guaranteed portion of the senior worker surplus per the probability weighting of their problem, the relative search effort remains ambiguous. Altogether, we can write the fixed-point equation for $\lbar{w}_m$ as:
+\begin{align*}
+\lbar{w}_m
+=
+& b-\psi a^*_m
++\tilde V_s(\lbar w_s)-\tilde V_s(\lbar w_m) \\
+&\quad
++\frac{\beta\gamma_{mm}\pi(a^*_m)}
+{1-\beta\gamma_{mm}(1-\delta)}
+\int_{\lbar{w}_m}^{\infty}
+\Bigl[
+w-\lbar{w}_m+\tilde V_s(w)-\tilde V_s(\lbar{w}_m)
+\Bigr]\,dF(w) \\
+&\quad
++\frac{\beta(1-\gamma_{mm})\pi(a^*_m)}
+{1-\beta\gamma_{ss}(1-\delta)}
+\int_{\lbar{w}_s}^{\infty}
+(w-\lbar{w}_s)\,dF(w)
+\end{align*}
+Once more, the resulting size of the reservation wage of middle-aged worker relative to that of a senior worker remains ambiguous. In particular, due to the increased search effort, this reduces the base net flow value. Furthermore, while the gains of a higher wage push up the potential future horizon payoffs, this also means that jobs at a lower wages have higher payoffs due to their increased time horizon.
+
+Finally, we solve the case of the young worker by drawing upon the symmetry of the recursion. In particular:
+\begin{align*}
+\lbar{w}_j
+=
+b-\psi a_j^*
+&+\tilde V_m(\lbar w_m)-\tilde V_m(\lbar w_j)\\
+&+\frac{\beta\gamma_{jj}\pi(a_j^*)}
+{1-\beta\gamma_{jj}(1-\delta)}
+\int_{\lbar{w}_j}^{\infty}
+\Bigl[
+w-\lbar{w}_j+\tilde V_m(w)-\tilde V_m(\lbar{w}_j)
+\Bigr]\,dF(w)\\
+&+\frac{\beta(1-\gamma_{jj})\pi(a_j^*)}
+{1-\beta\gamma_{mm}(1-\delta)}
+\int_{\lbar{w}_m}^{\infty}
+\Bigl[
+w-\lbar{w}_m+\tilde V_s(w)-\tilde V_s(\lbar{w}_m)
+\Bigr]\,dF(w)
+\end{align*}
+\begin{align*}
+a_j^*
+=
+\max\Biggl\{
+0,\,
+\frac{1}{\phi}&
+\ln\Biggl(
+\frac{\phi}{\psi}
+\biggl[
+\frac{\beta\gamma_{jj}}
+{1-\beta\gamma_{jj}(1-\delta)}
+\int_{\lbar{w}_j}^{\infty}
+\Bigl[
+w-\lbar{w}_j+\tilde V_m(w)-\tilde V_m(\lbar{w}_j)
+\Bigr]\,dF(w)\\
+&+
+\frac{\beta(1-\gamma_{jj})}
+{1-\beta\gamma_{mm}(1-\delta)}
+\int_{\lbar{w}_m}^{\infty}
+\Bigl[
+w-\lbar{w}_m+\tilde V_s(w)-\tilde V_s(\lbar{w}_m)
+\Bigr]\,dF(w)
+\biggr]
+\Biggr)
+\Biggr\}
+\end{align*}
+As before, the search effort of the young worker is ambiguous with respect to that of the middle-aged worker, as is the effect on their reservation wage.
+\medskip
+
+%Turning to the evolution of the system more globally, we note that a worker is young for an average of $10$ years, middle-aged for $25$, and senior for $5$, hence participating in the labour force for an average of $40$ years. It follows that, at the stationary distribution, the proportion of workers in each age cohort must be $0.25$, $0.625$, and $0.125$ respectively.
+Turning to the evolution of the system more globally, we note that per the representations of the age cohorts, a worker is in age cohort $g$ for duration $d_g$. It follows that, at the stationary distribution, we can define the proportion of workers in a given age cohort by:
+\[
+n_g\doteq\frac{d_g}{d_j+d_m+d_s}\quad\forall g\in\{j,m,s\}
+\]
+More generally, the expected length of time an agent stays in a certain age cohort is:
+\[
+\mathbb{E}[T_g]=\sum^\infty_{t=1}t\gamma_{gg}^{t-1}(1-\gamma_{gg})
+\]
+where we weight each time duration $t$ by the probability that they stay for precisely $t$, an and hence must leave in the next period. Solving the geometric series we obtain:
+\[
+\mathbb{E}[T_g]=\frac{1}{1-\gamma_{gg}}
+\]
+It follows that the transition probabilities are therefore given by:
+\begin{comment}
+\begin{align*}
+10=\frac{1}{1-\gamma_{jj}},\quad 
+25=\frac{1}{1-\gamma_{mm}},\quad 
+5=\frac{1}{1-\gamma_{ss}}\\
+\gamma_{jj}=0.9,\quad
+\gamma_{mm}=0.96,\quad
+\gamma_{ss}=0.8
+\end{align*}
+\end{comment}
+\begin{align*}
+d_j=\frac{1}{1-\gamma_{jj}},\quad 
+d_m=\frac{1}{1-\gamma_{mm}},\quad 
+d_s=\frac{1}{1-\gamma_{ss}}\\
+\gamma_{jj}=\frac{d_j-1}{d_j},\quad
+\gamma_{mm}=\frac{d_m-1}{d_m},\quad
+\gamma_{ss}=\frac{d_s-1}{d_s}
+\end{align*}
+Putting everything together, let us denote the respective population weights of the unemployed within each cohort as $u_g$ for $g\in\{j,m,s\}$. Let $h_t$ denote our state vector of workers at $t$, hence given by:
+\[
+h_t \doteq
+\bigl[(1-u_j),\, u_j,\, (1-u_m),\, u_m,\, (1-u_s),\, u_s\bigr]
+\bigl(\operatorname{diag}(n_j,n_m,n_s)\otimes I_2\bigr)
+\]
+where each entry is weighted by the stationary population weight of its respective cohort. Furthermore, we note that a worker leaves unemployment, only if they both have an offer, and this offer is at a wage greater than their reservation wage in the period in which they can accept. Let us denote this by $p_g$ for each cohort such that:
+\[
+p_{gg'}\doteq\pi(a^*_g)(1-F(\lbar{w}_{g'}))
+\]
+Correspondingly, we denote the per-age labour-force transition matrix by:
+\[
+L_{gg'}
+\doteq
+\begin{bmatrix}
+1-\delta & \delta \\
+p_{gg'} & 1-p_{gg'}
+\end{bmatrix},\quad
+\mathcal L
+\doteq
+\begin{bmatrix}
+L_{jj} & L_{jm} & 0 \\
+0 & L_{mm} & L_{ms} \\
+0 & 0 & L_{ss}
+\end{bmatrix}.
+\]
+Hence, the full system evolves as:\footnote{The full matrix can be found in the appendix. In effect, the matrix is $6\times6$ with each odd row for employed workers at $t$ and each even row for unemployed workers at $t$, with the age cohort increasing every odd row, as one goes down the matrix.}
+\begin{align*}
+h_{t+1}&=h_t\bigr[\bigl((\Gamma\otimes\mathbf{1}_{2\times 2})\odot\mathcal{L}\bigr)+(1-\gamma_{ss})\bigl((e_s e_j')\otimes(\mathbf 1_2 e_u')\bigr)\bigl]\\
+&=h_t\Pi
+\end{align*}
+where:\footnote{In particular, these elementary column vectors and the vector of $1$s combine to produce:
+\[
+\begin{bmatrix}
+0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 & 0 & 0 \\
+\end{bmatrix}
+\]
+which takes the last two entries of $h_t$ corresponding to the old age cohort (and hence the bottom two rows in the matrix), and sends them both to the unemployed young cohort at $t+1$, given by the second column.}
+\[
+e_j=
+\begin{bmatrix}1\\0\\0\end{bmatrix},
+\qquad
+e_s=
+\begin{bmatrix}0\\0\\1\end{bmatrix},
+\qquad
+e_u=
+\begin{bmatrix}0\\1\end{bmatrix},
+\qquad
+\mathbf 1_2=
+\begin{bmatrix}1\\1\end{bmatrix}.
+\]
+In effect, to obtain $h_{t+1}$, we multiply $H_t$ by a constructed transition matrix, which we denote as $\Pi$, where the first set of terms defines a $6\times6$ matrix comprised of the respective age and labour-state transitions, and the second set of terms sends the senior employed and unemployed workers into unemployed young workers with probability $1-\gamma_{ss}$. Since $\Pi$ is finite and row-stochastic, a stationary distribution $h^*$ exists such that:
+\[
+h^*=h^*\Pi
+\]
+In particular, under the usual positivity conditions ensuring irreducibility and aperiodicity, the system converges to it from any initial distribution. In effect, $h^*$ is the normalised row eigenvector of $\Pi$ with eigenvalue $1$.
+
+Taking a more explicit analytic approach for this exposition, we get the following analytic formulae for the age-cohort-specific laws of motion, dictating the flows in and out of unemployment:
+\begin{align*}
+u_j'=&\;\gamma_{jj}\bigl((1-p_{jj})u_j+\delta(1-u_j))\bigr) + \frac{n_s}{n_j}(1-\gamma_{ss})\\
+u_m'=&\;\gamma_{mm}\bigl((1-p_{mm})u_m+\delta(1-u_m))\bigr)\\
+&+\frac{n_j}{n_m}(1-\gamma_{jj})\bigl((1-p_{jm})u_j+\delta(1-u_j))\bigr)\\
+u'_s=&\;\gamma_{ss}\bigl((1-p_{ss})u_s+\delta(1-u_s))\bigr)\\
+&+\frac{n_m}{n_s}(1-\gamma_{mm})\bigl((1-p_{ms})u_m+\delta(1-u_m))\bigr)\\
+\end{align*}
+Since these values are constant between periods in equilibrium, we can solve recursively starting at the unemployment rate of the young to get:
+\begin{align*}
+u_j^*&=\frac{\gamma_{jj}\delta+\frac{n_s}{n_j}(1-\gamma_{ss})}{1-\gamma_{jj}(1-\delta-p_{jj})}\\
+u_m^*&=\frac{\gamma_{mm}\delta+\frac{n_j}{n_m}(1-\gamma_{jj})\left[\delta+(1-\delta-p_{jm})u_j^*\right]}{
+1-\gamma_{mm}(1-\delta-p_{mm})}\\
+u_s^*&=\frac{\gamma_{ss}\delta+\frac{n_m}{n_s}(1-\gamma_{mm})\left[
+\delta+(1-\delta-p_{ms})u_m^*\right]}
+{1-\gamma_{ss}(1-\delta-p_{ss})}
+\end{align*}
+Alternatively, solving in term of employment shares:
+\begin{align*}
+1-u_j'
+=&\;
+\gamma_{jj}
+\left[
+(1-\delta)(1-u_j)+p_{jj}u_j
+\right],
+\\
+1-u_m'
+=&\;
+\gamma_{mm}
+\left[
+(1-\delta)(1-u_m)+p_{mm}u_m
+\right]\\
+&+\frac{n_j}{n_m}(1-\gamma_{jj})
+\left[
+(1-\delta)(1-u_j)+p_{jm}u_j
+\right],
+\\
+1-u_s'
+=&\;
+\gamma_{ss}
+\left[
+(1-\delta)(1-u_s)+p_{ss}u_s
+\right]\\
+&+\frac{n_m}{n_s}(1-\gamma_{mm})
+\left[
+(1-\delta)(1-u_m)+p_{ms}u_m
+\right].
+\end{align*}
+Solving at equilibrium, we have:
+\begin{align*}
+1-u_j^*
+&=
+\frac{\gamma_{jj}p_{jj}}
+{1-\gamma_{jj}(1-\delta-p_{jj})}\\
+1-u_m^*
+&=
+\frac{
+\gamma_{mm}p_{mm}
++\frac{n_j}{n_m}(1-\gamma_{jj})\left[(1-\delta)+(p_{jm}-1+\delta)u_j^*\right]
+}
+{1-\gamma_{mm}(1-\delta-p_{mm})}\\
+1-u_s^*
+&=
+\frac{
+\gamma_{ss}p_{ss}
++\frac{n_m}{n_s}(1-\gamma_{mm})\left[(1-\delta)+(p_{ms}-1+\delta)u_m^*\right]
+}
+{1-\gamma_{ss}(1-\delta-p_{ss})}.
+\end{align*}
+In particular, we note that our two derivations provide the same values of $u^*_g$, $\forall g\in\{j,m,s\}$, since, per our age transition probabilities:\footnote{To see this even more clearly, note that $\frac{n_g}{n_g'}=\frac{d_g}{d_g'}$. Hence:
+\[
+    \frac{n_s}{n_j}=\frac{1-\gamma_{jj}}{1-\gamma_{ss}},\quad
+    \frac{n_j}{n_m}=\frac{1-\gamma_{mm}}{1-\gamma_{jj}},\quad
+    \frac{n_m}{n_s}=\frac{1-\gamma_{ss}}{1-\gamma_{mm}}
+\]
+}
+\[
+\frac{n_s}{n_j}(1-\gamma_{ss})
+=
+1-\gamma_{jj},
+\qquad
+\frac{n_j}{n_m}(1-\gamma_{jj})
+=
+1-\gamma_{mm},
+\qquad
+\frac{n_m}{n_s}(1-\gamma_{mm})
+=
+1-\gamma_{ss}.
+\]
+\medskip\\
+\noindent Before proceeding to the numerical methods section, we also deduce an expression for $G(w)$, the distribution of wages paid. In particular, since for a given age cohort $g\in\{j,m,s\}$, wages are only realised upon acceptance, the wage distribution coincides with the distribution of accepted offers, which is in turn a left-truncated distribution of $F(w)$. We note that:
+\[
+\mathbb{P}(W\leq w| W \geq \lbar{w}_g)=\frac{\mathbb{P}(\lbar{w}_g\leq W\leq w)}{\mathbb{P}(W\geq \lbar{w}_g)}=\frac{F(w)-F(\lbar{w}_g)}{1-F(\lbar{w}_g)}
+\]
+So, the corresponding wage distribution for $g$ is:
+\[
+G_g(w)=
+\begin{cases}
+    0,\quad &w<\lbar{w}_g\\
+    \frac{F(w)-F(\lbar{w}_g)}{1-F(\lbar{w}_g)},
+    \quad &w\geq\lbar{w}_g
+\end{cases}
+\]
+Finally, aggregating across cohorts, the distribution of wages among employed workers is:
+\[
+G(w)=\frac{\sum_{g\in\{j,m,s\}} n_gG_g(w)}{\sum_{g\in\{j,m,s\} n_g(1-u_g^*)}}
+\]
+\section{Numerical Solution}
+Given our expressions for the reservation wages at each cohort, we solve numerically by fixed-point iteration. In particular, we first define a set of bounds for $\phi$, starting with an initial intermediate guess, and use a root-finding algorithm to produce the next guess of $\phi$, after having recursively having solved for the reservation wages.
+
+To begin, we first first infer that the each $t$ corresponds to a month. Hence, to compute the values of $\gamma_{gg}$, $\forall g\in\{j,m,s\}$. Since an individual is on average young for 10 years, middle-aged for 25, and senior for 5, we can multiply each of these values by 12 and solve to get:
+\[
+\gamma_{jj}=\frac{119}{120},\quad\gamma_{mm}=\frac{299}{300},\quad\gamma_{jj}=\frac{59}{60}
+\]
+We note that once a middle-aged worker is unemployed, they leave unemployment when still middle aged with a probability of:
+\[
+\gamma_{mm}(\pi(a^*_m)(1-F(\lbar{w}_m)))
+\]
+using this interpretation for our calibration, it follows from the geometric distribution that the average duration of middle-aged worker's unemployment spell when middle-aged is:
+\[
+13=\frac{1}{1-\gamma_{mm}(\pi(a^*_m)(1-F(\lbar{w}_m)))}
+\]
+Since $a^*_m$ (and $\lbar{w}_m$ by its dependence on $a^*_m$) depends on $\phi$, it follows that a good guess for an initial window for $\phi$ must contain a value which satisfies the above equality. As an initial guess, we let $\phi\in(0,1)$ and pick the midpoint as our value for $\phi$ when we solve. 
+
+To solve for $\lbar{w}_s$ by fixed-point iteration, we verify that the
+associated operator satisfies the conditions of the contraction mapping theorem.\footnote{Blackwell's sufficient conditions do not apply here, since the operator is monotone decreasing rather than order-preserving.} Let:
+\begin{align*}
+T_s(x)
+=
+\max_{a\geq0}
+\left\{
+b-\psi a+
+\tilde\beta_s\pi(a)R(x)
+\right\},\\
+R(x)\doteq\int_x^\infty (1-F(w))\,dw,
+\qquad
+\tilde\beta_s\doteq
+\frac{\beta\gamma_{ss}}
+{1-\beta\gamma_{ss}(1-\delta)}.
+\end{align*}
+We show that the senior reservation wage is a fixed point of this operator, $\lbar w_s=T_s(\lbar w_s)$.
+In particular, we verify that $T_s$ is a contraction. For any $x,y\in\supp(F)$,
+\[
+|T_s(x)-T_s(y)|
+\leq
+\tilde\beta_s |R(x)-R(y)|.
+\]
+Since $R'(x)=-(1-F(x))$ and $0\leq 1-F(x)\leq1$, the mean value theorem gives
+\[
+|R(x)-R(y)|\leq |x-y|.
+\]
+Hence,
+\[
+|T_s(x)-T_s(y)|
+\leq
+\tilde\beta_s |x-y|.
+\]
+Therefore, if $\tilde\beta_s<1$, $T_s$ is a contraction on $\supp(F)$. Since
+$F$ has full support on $\mathbb R$, $\supp(F)=\mathbb R$, which is complete
+under the usual metric. Moreover, $T_s:\mathbb R\to\mathbb R$ is well-defined,
+since the tail integral is finite and the term $-\psi a$ bounds the maximization problem above. By the contraction mapping theorem, the iteration:
+\[
+\lbar w_s^{k+1}=T_s(\lbar w_s^k)
+\]
+therefore converges to a unique fixed point, which is the senior reservation wage.\footnote{A more detailed proof can be found in the appendix.}
+\begin{comment}
+Since $T_s$ is a contraction,
+\[
+|\underline w_s^{k+1}-\underline w_s^k|
+=
+|T_s(\underline w_s^k)-T_s(\underline w_s^{k-1})|
+\leq
+C|\underline w_s^k-\underline w_s^{k-1}|.
+\]
+Iterating this inequality,
+\[
+|\underline w_s^{k+1}-\underline w_s^k|
+\leq
+C^k|\underline w_s^1-\underline w_s^0|.
+\]
+Therefore, for any $n>m$,
+\[
+|\underline w_s^n-\underline w_s^m|
+\leq
+\sum_{r=m}^{n-1}
+|\underline w_s^{r+1}-\underline w_s^r|
+\leq
+\sum_{r=m}^{n-1}
+C^r|\underline w_s^1-\underline w_s^0|.
+\]
+Using the geometric-series bound,
+\[
+|\underline w_s^n-\underline w_s^m|
+\leq
+\frac{C^m}{1-C}
+|\underline w_s^1-\underline w_s^0|.
+\]
+Since $C<1$, we have $C^m\to 0$ as $m\to\infty$. Hence
+\[
+\{\underline w_s^k\}_{k=0}^\infty
+\]
+is a Cauchy sequence. Because $X$ is complete, there exists some
+$\underline w_s^*\in X$ such that
+\[
+\underline w_s^k\to \underline w_s^*.
+\]
+By continuity of $T_s$,
+\[
+\underline w_s^*
+=
+\lim_{k\to\infty}\underline w_s^{k+1}
+=
+\lim_{k\to\infty}T_s(\underline w_s^k)
+=
+T_s(\underline w_s^*).
+\]
+Thus $\lbar{w}_s^*$ is a fixed point. Additionally, we have shown earlier that $\lbar{w}_s^*$ is unique.
+\end{comment}
+
+In effect, we can thus obtain a fixed point senior reservation wage by taking any initial guess $\lbar{w}_s^0\in\supp(F(w))$, solving for $a^*_s$, and then solving $T_s(lbar{w}_s^0)$ to return, $\lbar{w}_s^1$, and repeat as before, stopping once the difference in our current output and that of the previous iteration meets a sufficient tolerance, indicating a sufficiently close numerical approximation of $\lbar{w}_s^*$ the equilibrium senior reservation wage.
+\end{document}
