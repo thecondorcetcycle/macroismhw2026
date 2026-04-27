@@ -1,0 +1,54 @@
+# The types of latex files to ignore!
+
+# Core LaTeX auxiliary files
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+
+# Bibliography
+*.bbl
+*.blg
+*.bcf
+*.run.xml
+
+# Indexing
+*.idx
+*.ilg
+*.ind
+
+# Glossaries & acronyms
+*.acn
+*.acr
+*.alg
+*.glg
+*.glo
+*.gls
+
+# Hyperref / cross-referencing
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# TikZ / PGF
+*.nav
+*.snm
+
+# Beamer
+*.vrb
+
+# Latexmk
+*.xdv
+
+# Misc
+*.dvi
+*.ps
+*.loa
+
+# Temporary directories
+_build/
+build/
+tmp/
+temp/
