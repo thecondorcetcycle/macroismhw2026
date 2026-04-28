@@ -49,7 +49,7 @@ Once you have **Git** installed, open the folder where you'd like to have the pr
 
 3. > `git pull origin main`).
 
-Finally, when you finished adding in all your changes, do:
+Finally, when you finished adding in all your changes (make sure to save!), do:
 
 1. `git add .`, or `git add [filename]` if you just worked one file
 
@@ -70,7 +70,6 @@ To work with LaTeX in **VSCode**, you’ll need a couple of things set up first.
 1. **A LaTeX distribution** (this is what actually compiles your `.tex` files):
    - **Windows**: Install **MiKTeX** or **TeX Live**
    - **MacOS**: Install **MacTeX**
-   - **Linux**: Install **TeX Live** via your package manager
 
 2. **LaTeX Workshop extension in VSCode**
    - Go to Extensions in VSCode  
