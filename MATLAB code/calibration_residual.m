@@ -11,11 +11,12 @@ function [Omega, sol] = calibration_residual(phi, par, obj, target_duration)
     [w_m, a_m] = solve_wm(phi, par, obj, w_s);
 
     %% Exit probability from middle-aged unemployment
-    % The spell as a middle-aged unemployed worker ends either by finding a
-    % job while remaining middle-aged or by aging into the senior cohort.
+    % The middle-aged unemployment spell ends either when the worker finds
+    % an acceptable job while remaining middle-aged or when the worker ages
+    % out of the middle-aged cohort.
 
-    q_m = par.gamma_mm * obj.pi(a_m, phi) * (1 - obj.F(w_m)) ...
-        + (1 - par.gamma_mm);
+    p_mm = obj.pi(a_m, phi) * (1 - obj.F(w_m));
+    q_m = par.gamma_mm * p_mm + (1 - par.gamma_mm);
 
     %% Implied duration and residual
 
@@ -29,6 +30,7 @@ function [Omega, sol] = calibration_residual(phi, par, obj, target_duration)
         sol.a_s = a_s;
         sol.w_m = w_m;
         sol.a_m = a_m;
+        sol.p_mm = p_mm;
         sol.q_m = q_m;
         sol.duration_m = duration_m;
         sol.target_duration = target_duration;

@@ -1,17 +1,40 @@
 \documentclass{article}
 \usepackage{amsmath} %for align, etc.
 \usepackage{amssymb} %for \mathbb, \mathcal, etc.
-\usepackage{graphicx} %for resizing large displayed matrices
+\usepackage{graphicx} %for resizing large-displayed matrices
 \usepackage{comment} %to comment out some stuff we might use later instead
-\newcommand{\lbar}[1]{\underline{#1}} %easier way to write lower bar
+\newcommand{\lbar}[1]{\underline{#1}} %easier way to write 'lower bar'
 \DeclareMathOperator\supp{supp} %support function
+\setcounter{tocdepth}{4} %include paragraph headings in TOC
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage[hidelinks]{hyperref} %clickable links (with no red boxes)
 
 \begin{document}
-\textit{To solve this problem, we first make the assumption that all young workers initially join the labour-force unemployed. We also assume that unemployed workers who search can only accept their offer in the next period.}
 
-\section{A General Analytic Solution}
+\begin{titlepage}
+\pagenumbering{gobble}
+\title{Ageing, Job Search, and Wage Distribution}
+
+\author{Anne Pfister \quad Armel François \quad Gereon Staratschek}
+
+\maketitle
+
+
+\tableofcontents
+\par\medskip
+\end{titlepage}
+
+\pagenumbering{arabic}
+\textit{To solve the model, we make three assumptions: (i) all young workers initially join the labour force unemployed; (ii) unemployed workers who search can only accept their offer in the next period; (iii) the wage a worker accepts persists as the worker ages out of the cohort in which they received the offer.}
+\par\medskip
+\section{Implicit Equilibrium Characterisation}
 \smallskip
-Since old workers leave the labour-force upon retirement, this amounts to all workers facing the following age transition matrix:\footnote{We have opted to replace all $\pi$s in the age transition probabilities with $\gamma$s so as to keep this notationally distinct from the endogenous job finding probability $\pi(a)$}
+
+\subsection{The workers' programs.}
+
+\paragraph{The general dynamic problem.}
+In each period, workers face a given age-specific probability of ageing up, or in the case of senior workers, leaving the labour force upon retirement. Hence, all workers face the following age transition matrix:\footnote{We have opted to replace all $\pi$s in the age transition probabilities with $\gamma$s in order to keep this notationally distinct from the endogenous job finding probability $\pi(a)$.}
 \[
 \Gamma = \begin{bmatrix}
     \gamma_{jj} & 1-\gamma_{jj} & 0 \\
@@ -19,9 +42,9 @@ Since old workers leave the labour-force upon retirement, this amounts to all wo
     0 & 0 & \gamma_{ss}
 \end{bmatrix}
 \]
-In effect, in each period of their existence, senior workers exit the labour-force with a probability of $1-\gamma_{ss}$. As we will see later, this places heterogeneous incentives on the search effort of unemployed workers throughout their life cycle.
+In particular, since seniors effectively leave the labour force with probability $1-\gamma_{ss}$, we have opted for this unbalanced matrix representation to capture the fact that seniors can only continue to be in the labour force with a probability $\gamma_{ss}$, and implicitly normalise their pay-off to $0$ when outside the labour force. As we will see later, this places heterogeneous incentives on the search effort of unemployed workers throughout their life cycle.
 
-Let $V_{l,g}$ denote the value function of a worker who is of employment status $l\in\{e,u\}$ (employed or unemployed), and age $g\in\{j,m,s\}$ (young, middle-aged, or senior).\footnote{Note that we have opted to use $g$ to index age, to prevent any possible future confusion with the senior age $s$, accordingly, we have also used $\delta$ for the exogenous separation/job destruction rate.} At each period, a worker faces a stochastic infinite horizon problem, where each subsequent period they experience a probability of aging up (or leaving the labour-force if senior), and changing employment status. Hence, we write the representative Bellman equations as follows, for all ages $g\in\{j,m,s\}$:
+Let $V_{l,g}$ denote the value function of a worker who is of employment status $l\in\{e,u\}$ (employed or unemployed), and age $g\in\{j,m,s\}$ (young, middle-aged, or senior).\footnote{Note that we have opted to use $g$ to index age, to prevent any possible future confusion with the senior age $s$, accordingly, we have also used $\delta$ for the exogenous separation/job destruction rate.} At each period, a worker faces a stochastic infinite horizon problem, where, in each subsequent period, they experience the probability of aging up (or leaving the labour force if senior), and the probability of changing employment status. Hence, we write the representative Bellman equations as follows, for all ages $g\in\{j,m,s\}$:
 \begin{align}
 V_{e,g}(w)
 &=
@@ -40,114 +63,213 @@ b - \psi a_g + \beta \sum_{g'} \Gamma(g' \mid g)
 \Bigr]
 \Biggr\} \notag
 \end{align}
-Here, we let $g$ refer to the age of worker in their present period, and $g'$ to their age in their next period. Similarly, we use $\Gamma(g'|g)$ to refer to the age transition probability to age $g'$ given they are currently at age $g$, where combining with the sum over all $g'$ gives the expected next period age. Altogether,~\eqref{eq:bell_w} and~\eqref{eq:bell_u} represent the Bellman equations for employed and unemployed workers respectively representing the present values of each state, where $V_{e,g}(w)$ takes the current wage as an argument through its role as a state variable.
+Here, we let $g$ refer to the age of worker in their present period, and $g'$ to their age in their next period. Similarly, we use $\Gamma(g'|g)$ to refer to the age transition probability of a worker to age $g'$ given they are currently at age $g$, where combining with the sum over all $g'$ gives the expected next-period age. Altogether,~\eqref{eq:bell_w} and~\eqref{eq:bell_u} represent the Bellman equations for employed and unemployed workers respectively representing the present values of each state, where $V_{e,g}(w)$ takes the current wage as an argument through its role as a state variable.
 
-We pay particular attention to~\eqref{eq:bell_u}, insofar as the wage itself is drawn stochastically from $F(w)$. Hence, a worker only accepts an offer if the present value of a accepting the offer outweighs that of being unemployed, represented in the ${E}_w \bigl[\max\{V_{u,g'}, V_{e,g'}(w)\}\bigr]$ portion of the present value of being unemployed.
+We pay particular attention to~\eqref{eq:bell_u}, insofar as the wage itself is drawn stochastically from $F(w)$. Hence, a worker only accepts an offer if the present value of accepting the offer is higher than that of being unemployed, represented in the term ${\mathbb{E}}_w \bigl[\max\{V_{u,g'}, V_{e,g'}(w)\}\bigr]$ in the expression of the present value of being unemployed. Moreover, unemployed workers actively face a maximization problem, as they have to pick their search effort in the present state.
 
-Solving backwards from the final age cohort, we note that if a senior worker is in a given labour market state in the next period, they can only be so when senior. With this in mind, we obtain the following expression for the value of being 
-employed with a given wage $w$ when old:
-\begin{align*}
+\paragraph{The senior worker's problem.}
+We approach the problem by solving backwards from the final age cohort. We note that if a senior worker is in a given employment state in the next period, they can only be so when \textit{still} senior. With this in mind, we obtain the following expression for the value of being  employed with a given wage $w$ when senior:
+\begin{equation}
+\begin{aligned}
 V_{e,s}(w)&=w+\beta\gamma_{ss}\bigl[(1-\delta)V_{e,s}(w)+\delta V_{u,s}\bigr]\\
 &=\frac{w+\beta\gamma_{ss}\delta V_{u,s}}{1-\beta\gamma_{ss}(1-\delta)}
-\end{align*}
-Furthermore, we note that a senior worker will only accept a job if the net present value of accepting the job is at least as great as that of being unemployed:
+\end{aligned}
+~\label{eq:sen_emp_as_umemp}
+\end{equation}
+Furthermore, we note that a senior worker will only accept a job if the present value of accepting the job is at least as great as that of being unemployed, which yields the following inequality with respect to the wage rate:
 \begin{align*}
 V_{u,s}&\leq\frac{w+\beta\gamma_{ss}\delta V_{u,s}}{1-\beta\gamma_{ss}(1-\delta)}\\
-w&\geq(1-\beta\gamma_{ss})V_{u,s}
+w&\geq(1-\beta\gamma_{ss})V_{u,s}\\
+V_{u,s}&\leq\sum_{t=0}^\infty(\beta\gamma_{ss})^tw
 \end{align*}
-Since $F(w)$ is continuous and has full support on $\mathbb{R}$, there exists a reservation wage $\lbar{w}_s\in\supp(F(w))$ satisfying the above expression with perfect equality, such that any wage offers below this value will not be accepted when senior. In effect, a senior worker values unemployment at:
+In effect, the acceptance condition can be rewritten to show that an offer is accepted if the present discounted value of receiving wage $w$ for as long as the senior worker remains in the labour force is at least as large as the value of remaining unemployed. Moreover, since $F(w)$ is continuous and has full support on $\mathbb{R}$, there exists a reservation wage $\lbar{w}_s\in\supp(F(w))$ satisfying the above expression with equality, such that any wage offers below this value will not be accepted when senior. Thus, we obtain the following closed-form expression for the value of unemployment as a senior worker, expressed in terms of their reservation wage, the discount factor, and the probability of remaining in the labour force:
 \begin{equation}
-V_{u,s}=\frac{\lbar{w}_s}{1-\beta\gamma_{ss}}
+V_{u,s}=\frac{\lbar{w}_s}{1-\beta\gamma_{ss}}.
 ~\label{eq:sen_res_unemp}
 \end{equation}
-Moreover, to compute the expected gain from accepting an offer at a given wage $w\geq\lbar{w}_s$, we can calculate the difference for senior workers between the value of unemployment and that of employment:
+
+Then, to compute the expected gain from receiving a wage draw, we can start from the object appearing in the unemployment value:
+\[
+\mathbb{E}_w\bigl[\max\{V_{u,s},V_{e,s}(w)\}\bigr].
+\]
+Since the senior worker accepts only wages satisfying $w\geq \lbar{w}_s$, this can be rewritten as:
 \begin{align*}
-\mathbb{E}[V_{e,s}(w)-V_{u,s}|w\geq\lbar{w}_s]=\frac{\mathbb{E}[w-\lbar{w}_s|w\geq\lbar{w}_s]}{1-\beta\gamma_{ss}(1-\delta)}\\
-\mathbb{E}[V_{e,s}(w)|w\geq\lbar{w}_s]=\frac{\mathbb{E}[w-\lbar{w}_s|w\geq\lbar{w}_s]}{1-\beta\gamma_{ss}(1-\delta)}+V_{u,s}
+\mathbb{E}_w\bigl[\max\{V_{u,s},V_{e,s}(w)\}\bigr]
+&=
+V_{u,s}
++
+\mathbb{E}_w\!\left[
+\bigl(V_{e,s}(w)-V_{u,s}\bigr)
+\mathbf{1}\{w\geq \lbar{w}_s\}
+\right].
 \end{align*}
-Substituting this identity back into the senior's Bellman equation when unemployed, we get:
+Furthermore, we can re-arrange our expression from~\eqref{eq:sen_emp_as_umemp} to get the present discounted surplus from accepting a senior employment offer at wage $w$:
+\[
+V_{e,s}(w)-V_{u,s}
+=
+\frac{w-\lbar{w}_s}{1-\beta\gamma_{ss}(1-\delta)}.
+\]
+Then, using the identity above, it follows that:
+\begin{align}
+\mathbb{E}_w\bigl[\max\{V_{u,s},V_{e,s}(w)\}\bigr]
+&=
+V_{u,s}
++
+\frac{
+\mathbb{E}_w\!\left[
+(w-\lbar{w}_s)\mathbf{1}\{w\geq \lbar{w}_s\}
+\right]
+}{
+1-\beta\gamma_{ss}(1-\delta)
+}.
+~\label{eq:expected_max_senior}
+\end{align}
+Substituting this identity in integral form back into the senior's Bellman equation when unemployed, we get:
 \begin{align*}
 V_{u,s}&=\max_{a_s\geq 0}\Biggl\{b-\psi a_s+\beta\gamma_{ss}\biggl[V_{u,s}+\frac{\pi(a_s)}{1-\beta\gamma_{ss}(1-\delta)}\int_{\lbar{w}_s}^\infty(w-\lbar{w}_s)dF(w)\biggr]\Biggr\}\\
 \lbar{w}_s&=\max_{a_s\geq 0}\Biggl\{b-\psi a_s+\frac{\beta\gamma_{ss}\pi(a_s)}{1-\beta\gamma_{ss}(1-\delta)}\int_{\lbar{w}_s}^\infty(w-\lbar{w}_s)dF(w)\Biggr\}\\
 \end{align*}
-where in the first line we replace the expectation term with the integral with respect to the distribution, and in the second regroup $V_{u,s}$ to the left-hand-side, and substitute for the senior reservation wage, given the identity~\eqref{eq:sen_res_unemp}.
+where, in the first line, the expectation term is replaced by its integral representation over the accepted region of the wage distribution. In the second line, we use the senior reservation-wage identity in~\eqref{eq:sen_res_unemp} to regroup the unemployment value on the left-hand side. 
 
-To obtain an implicit solution, we first solve for optimal senior search effort $a_s$, taking the first order condition of our expression for $\lbar{w}_s$ with respect to this, we get:
+Intuitively, the reservation wage has to be at least as great as the flow payoff from being unemployed (the benefit rate $b$) netted with the flow disutility of chosen search effort. Turning to the second term (by which the net flow is summed), we can re-write it as follows:
 \[
-a_s^*=\max\Biggl\{0,\frac{1}{\phi}\ln\biggl(\frac{\phi\beta\gamma_{ss}\int_{\lbar{w}_s}^\infty(w-\lbar{w}_s)dF(w)}{\psi(1-\beta\gamma_{ss}(1-\delta))}\biggr)\Biggr\},
+\beta\gamma_{ss}\pi(a_s)\sum_{t=0}^\infty(\beta\gamma_{ss}(1-\delta))^t\int_{\lbar{w}_s}^\infty(w-\lbar{w}_s)dF(w)
 \]
-where an interior solution follows only if $\phi\beta\gamma_{ss}\int_{\lbar{w}_s}^\infty(w-\lbar{w}_s)dF(w)>\psi(1-\beta\gamma_{ss}(1-\delta))$, else the senior worker opts to remain unemployed throughout, and the distribution of wages for senior workers is degenerate.
+This captures the present discounted value of the expected wage surplus from an accepted offer. The surplus is weighted by the discounted probability that the worker remains in the labour force and receives an offer next period, and scaled by the continuation value of employment, which reflects both labour force retention and match survival in future periods. Hence, the reservation wage reflects both the net flow, along with the actualised surplus.
 
-Since $F(w)$ is distributed normally, there is no elementary closed form for the cumulative distribution function. Nonetheless, it is clear that plugging $a_s^*$ back in will provide us with a fixed point equation, hence a there exists a solution to our equation. Moreover, note by Tonelli's theorem that:
+To obtain an implicit solution, we first solve for optimal senior search effort $a_s$. Note that the probability of obtaining a job offer as a function of search effort is given as $\pi(a_s) = 1 - e^{-\phi a_s}$. Taking the first order condition of our expression for $\lbar{w}_s$ with respect to $a_s$, we get:
+\[
+a_s^*=\max\Biggl\{0,\frac{1}{\phi}\ln\biggl(\frac{\phi}{\psi}\frac{\beta\gamma_{ss}}{(1-\beta\gamma_{ss}(1-\delta))}\int_{\lbar{w}_s}^\infty(w-\lbar{w}_s)dF(w)\biggr)\Biggr\},
+\]
+where an interior solution exists only if $\phi\beta\gamma_{ss}\int_{\lbar{w}_s}^\infty(w-\lbar{w}_s)dF(w)\geq\psi(1-\beta\gamma_{ss}(1-\delta))$; otherwise, the senior worker opts to remain unemployed throughout, and the distribution of wages paid to senior workers is degenerate.
+
+Intuitively, the senior worker chooses search effort by comparing the marginal cost of search with the marginal expected value of increasing the probability of receiving an acceptable offer. Search effort is costly at the constant marginal rate $\psi$, while it raises the offer-arrival probability according to $\pi(a_s)=1-e^{-\phi a_s}$. Hence the marginal effect of search on the offer probability is $\pi'(a_s)=\phi e^{-\phi a_s}$, so search has diminishing marginal returns.
+
+The optimality condition equates the marginal cost of search, $\psi$, with the marginal expected benefit,
+\[
+\phi e^{-\phi a_s}
+\frac{\beta\gamma_{ss}}
+{1-\beta\gamma_{ss}(1-\delta)}
+\int_{\lbar{w}_s}^{\infty}(w-\lbar{w}_s)\,dF(w).
+\]
+Hence, the marginal benefit of search is the marginal increase in the offer-arrival probability, $\pi'(a_s)=\phi e^{-\phi a_s}$, multiplied by the net present value of the expected wage surplus from an acceptable offer, where the initial payoff is weighted by the discounted survival probability $\beta\gamma_{ss}$ and future payoffs are summarized by the geometric continuation factor $1/[1-\beta\gamma_{ss}(1-\delta)]$. Thus, search effort is positive only when this term is large enough relative to the marginal cost parameter $\psi$. Otherwise, the senior worker optimally chooses $a_s^*=0$.
+
+Economically, $\psi$ shifts the cost-benefit comparison: a higher $\psi$ makes search more expensive and therefore lowers effort by reducing the marginal expected gain relative to the marginal cost. The parameter $\phi$, however, governs the productivity of search effort itself. Since
+\[
+\pi'(a_s)=\phi e^{-\phi a_s},
+\]
+a higher $\phi$ raises the marginal return to initial search, but it also means that the offer-arrival probability rises more quickly with effort and therefore reaches diminishing returns sooner. Thus, $\phi$ appears inside the logarithm because it raises the marginal benefit of search, while the factor $1/\phi$ coming from the exponent, and hence outside the logarithm, reflects the fact that fewer units of effort are required when each unit of effort is more effective.
+
+Since $F(w)$ is normally distributed, its cumulative distribution function has no elementary closed form. Therefore, the reservation-wage equation cannot generally be solved explicitly. Substituting the optimal search effort $a_s^*$ back into the reservation-wage condition instead yields an implicit fixed-point equation in $\lbar{w}_s$. Moreover, by Tonelli's theorem it holds that:
 \[
 \int_{\lbar{w}_s}^{\infty} (w-\lbar{w}_s)dF(w)
 = \int_{\lbar{w}_s}^{\infty}\int_x^{\infty} dF(w)dx
 = \int_{\lbar{w}_s}^{\infty} \bigl(1-F(w)\bigr)dw.
 \]
-We can hence write our fixed-point equation for $\lbar{w}_s$ as:
+We can therefore write our fixed-point equation for $\lbar{w}_s$ as:
 \begin{equation}
 \lbar{w}_s=b-\psi a_s^*+\frac{\beta\gamma_{ss}(1-e^{-\phi a_s^*})}{1-\beta\gamma_{ss}(1-\delta)}\int_{\lbar{w}_s}^{\infty} \bigl(1-F(w)\bigr)dw
 ~\label{eq:ws_fixed_point}
 \end{equation}
-Intuitively, the right-hand side captures $b$ denotes the flow payoff from unemployment net of the optimal flow search effort cost $\psi a_s^*$, plus the expected wage gain from future job offers: the probability of receiving an acceptable offer, $1-e^{-\phi a_s^*}$, multiplied by the discounted expected surplus from such an offer, while the factor $\frac{\beta\gamma_{ss}}{1-\beta\gamma_{ss}(1-\delta)}$ scales this surplus by the effective duration of employment, accounting for both discounting and job destruction.
+As we recall from our intuition, the right-hand side captures the optimal flow payoff from unemployment (the unemployment benefit $b$) net of the optimal flow search effort cost $\psi a_s^*$, plus the present value of the expected wage gain from future job offers. This term is expressed by the probability of receiving an offer, $1-e^{-\phi a_s^*}$, multiplied by the unconditional expected surplus from offers above the reservation wage. Additionally, the factor $\frac{\beta\gamma_{ss}}{1-\beta\gamma_{ss}(1-\delta)}$ scales this surplus by the effective duration of employment, accounting for both discounting and job destruction. It follows that, at an interior solution:
 
-\noindent It follows that, at an interior solution:
 \[
 \frac{d}{d\lbar{w}_s}\biggl(b-\psi a_s^*+\frac{\beta\gamma_{ss}(1-e^{-\phi a_s^*})}{1-\beta\gamma_{ss}(1-\delta)}\int_{\lbar{w}_s}^{\infty} \bigl(1-F(w)\bigr)dw\biggr)<0
 \]
-To see this explicitly, let us denote the right hand side of~\eqref{eq:ws_fixed_point} by $\lbar{w}_s$, which is itself a function both directly of $\lbar{w}_s$, and implicitly by $a^*_g(\lbar{w}_s)$. Thus, by the envelope theorem:
+To see this explicitly, let us denote the right hand side of~\eqref{eq:ws_fixed_point} by $T_s$, a function both directly of $\lbar{w}_s$, and implicitly by $a^*_g(\lbar{w}_s)$. Thus, by the envelope theorem:
+
 \begin{align*}
-\frac{d\lbar{w}_s(a^*_g(\lbar{w}_s), \lbar{w}_s)}{d\lbar{w}_s}&=\frac{\partial \lbar{w}_s(a^*_g(\lbar{w}_s), \lbar{w}_s)}{\partial a^*_g(\lbar{w}_s)}\frac{\partial a^*_g(\lbar{w}_s)}{\partial \lbar{w}_s}+\frac{\partial \lbar{w}_s(a^*_g(\lbar{w}_s), \lbar{w}_s)}{\partial \lbar{w}_s}\\
-&=\frac{\partial \lbar{w}_s(a^*_g(\lbar{w}_s), \lbar{w}_s)}{\partial \lbar{w}_s}\\
+\frac{dT_s(a^*_g(\lbar{w}_s), \lbar{w}_s)}{d\lbar{w}_s}&=\frac{\partial T_s(a^*_g(\lbar{w}_s), \lbar{w}_s)}{\partial a^*_g(\lbar{w}_s)}\frac{\partial a^*_g(\lbar{w}_s)}{\partial \lbar{w}_s}+\frac{\partial T_s(a^*_g(\lbar{w}_s), \lbar{w}_s)}{\partial \lbar{w}_s}\\
+&=\frac{\partial T_s(a^*_g(\lbar{w}_s), \lbar{w}_s)}{\partial \lbar{w}_s}\\
 &=-\frac{\beta\gamma_{ss}(1-e^{-\phi a_s^*})}{1-\beta\gamma_{ss}(1-\delta)}\bigl(1-F(\lbar{w}_s)\bigr)<0
 \end{align*}
-Therefore, since $\lbar{w}_s$ is strictly decreasing in $\lbar{w}_s$, and the identity function is strictly increasing, it follows that the senior reservation wage is unique at the interior. At the corner solution, the reservation wage is trivially unique; with $a^*_s=0$, the identity simplifies to:
+Therefore, since $\lbar{w}_s$ is strictly decreasing in $\lbar{w}_s$, and the identity function is strictly increasing, it follows that the senior reservation wage is unique at the interior. Existence follows by applying the intermediate value theorem to the residual between the right- and left-hand sides: under the maintained parameter restrictions, this residual is continuous, positive for sufficiently low $\lbar{w}_s$, and negative for sufficiently high $\lbar{w}_s$. Hence, the residual crosses zero exactly once, so the interior senior reservation wage exists and is unique. 
+
+At the corner solution, the existence of a unique reservation wage trivial; with $a^*_s=0$, the identity simplifies to:
 \[
 \lbar{w}_s=b
 \]
-More importantly, this also affords us the ability to derive implicit solutions for the remaining two age cohorts. With our senior reservation wage now well defined, we proceed onto the subsequent age cohorts. In particular, for notational simplicity, let us define from our solved objects, the present-discounted transition value of being senior for an employed middle-aged worker:
+
+\paragraph{The middle-aged worker's problem.}
+
+With the senior reservation wage now well-defined, we proceed to derive the corresponding implicit characterization for middle-aged workers. Let
 \[
-\tilde{V}_s(w)\doteq \beta(1-\gamma_{mm})\bigl((1-\delta)V_{e,s}(w)+\delta V_{u,s}\bigr)
+\tilde{V}_s(w)
+\doteq
+\beta(1-\gamma_{mm})
+\bigl((1-\delta)V_{e,s}(w)+\delta V_{u,s}\bigr)
 \]
-It follows that the middle-aged present value of being employed at wage $w$, as a function of the value of being unemployed is:
-\[
-V_{e,m}(w)=\frac{w+\beta\gamma_{mm}\delta V_{u,m}+\tilde{V}_s(w)}{1-\beta\gamma_{mm}(1-\delta)}
-\]
-Proceeding as before, we note the existence of a reservation wage satisfying:
+denote the present discounted continuation value associated with transitioning into seniority while employed at wage $w$.
+
+The value of employment for a middle-aged worker is then:
+\begin{gather*}
+V_{e,m}(w)
+=
+w
++
+\beta\gamma_{mm}
+\bigl[(1-\delta)V_{e,m}(w)+\delta V_{u,m}\bigr]
++
+\tilde{V}_s(w),
+\\
+V_{e,m}(w)
+=
+\frac{
+w+\beta\gamma_{mm}\delta V_{u,m}+\tilde{V}_s(w)
+}{
+1-\beta\gamma_{mm}(1-\delta)
+}.
+\end{gather*}
+Proceeding as before, a middle-aged worker accepts an offer only if its employment value is at least as large as the value of remaining unemployed. The reservation wage $\lbar{w}_m$ therefore satisfies:
 \begin{align*}
-\lbar{w}_m=(1-\beta\gamma_{mm})V_{u,m}-\tilde{V}_s(\lbar{w}_m)
+\lbar{w}_m
+&=
+(1-\beta\gamma_{mm})V_{u,m}
+-
+\tilde{V}_s(\lbar{w}_m),
+\\
+V_{u,m}
+&=
+\sum_{t=0}^{\infty}
+(\beta\gamma_{mm})^t
+\bigl(\lbar{w}_m+\tilde{V}_s(\lbar{w}_m)\bigr).
 \end{align*}
-Hence, using this reservation wage condition, we have:
+Intuitively, the middle-aged reservation wage makes the worker indifferent between accepting employment and remaining unemployed at the middle-aged decision node. Written as a geometric series, accepting $\lbar{w}_m$ yields the discounted middle-aged wage flow received while the worker remains middle-aged, together with the embedded continuation payoff from potentially entering seniority while employed at that wage. Hence, the reservation wage is the annuitised value of unemployment net of this seniority continuation value.
+
+Using the reservation-wage condition, the net gain from employment at wage $w$ relative to unemployment is
 \[
-V_{e,m}(w)-V_{u,m}=
+V_{e,m}(w)-V_{u,m}
+=
 \frac{
 w-\lbar{w}_m+\tilde V_s(w)-\tilde V_s(\lbar{w}_m)
 }
-{1-\beta\gamma_{mm}(1-\delta)}
+{1-\beta\gamma_{mm}(1-\delta)}.
 \]
-In addition, using the same approach as before, solving for $\lbar{w}_m$, we get:
-\begin{align*}
+Thus, unlike the senior worker's surplus, the middle-aged surplus contains both the direct wage gain, $w-\lbar{w}_m$, and the change in the senior continuation value, $\tilde V_s(w)-\tilde V_s(\lbar{w}_m)$.
+
+Substituting this surplus into the middle-aged unemployment problem gives the fixed-point equation, given optimal search effort:
+\begin{align}
 \lbar{w}_m
 =
-\max_{a_m\geq 0}
-\Biggl\{
-& b-\psi a_m
-+\tilde V_s(\lbar w_s)-\tilde V_s(\lbar w_m) \\
+&\; b-\psi a_m^*
++\tilde V_s(\lbar w_s)-\tilde V_s(\lbar w_m)
+\nonumber\\
 &\quad
-+\frac{\beta\gamma_{mm}\pi(a_m)}
++\frac{\beta\gamma_{mm}\pi(a_m^*)}
 {1-\beta\gamma_{mm}(1-\delta)}
 \int_{\lbar{w}_m}^{\infty}
 \Bigl[
 w-\lbar{w}_m+\tilde V_s(w)-\tilde V_s(\lbar{w}_m)
-\Bigr]\,dF(w) \\
+\Bigr]\,dF(w)
+\nonumber\\
 &\quad
-+\frac{\beta(1-\gamma_{mm})\pi(a_m)}
++\frac{\beta(1-\gamma_{mm})\pi(a_m^*)}
 {1-\beta\gamma_{ss}(1-\delta)}
 \int_{\lbar{w}_s}^{\infty}
-(w-\lbar{w}_s)\,dF(w)
-\Biggr\}
-\end{align*}
-where we use the fact that $V_{e,s}(\lbar{w}_s)=V_{u,s}$. Moreover, this entails an optimal search effort of:
+(w-\lbar{w}_s)\,dF(w).
+\label{eq:wm_fixed_point}
+\end{align}
+where we once again apply the reservation wage condition that $V_{e,s}(\lbar{w}_s)=V_{u,s}$. Moreover, this implies an optimal search effort of:
 \begin{align*}
 a_m^*
 =
@@ -170,111 +292,192 @@ w-\lbar{w}_m+\tilde V_s(w)-\tilde V_s(\lbar{w}_m)
 \biggr]\Biggr)
 \Biggr\}.
 \end{align*}
-In particular, the last term captures within it the additional gain when senior, if a suitable wage was drawn when middle-aged:
-\begin{align*}
-\lbar w_s=b-\psi a_s^*+
-\frac{\beta\gamma_{ss}\pi(a_s^*)}
-{1-\beta\gamma_{ss}(1-\delta)}
-\int_{\lbar w_s}^{\infty}(w-\lbar w_s)\,dF(w)\\
-\frac{1}{1-\beta\gamma_{ss}(1-\delta)}
-\int_{\lbar w_s}^{\infty}(w-\lbar w_s)\,dF(w)
-=
-\frac{\lbar w_s-b+\psi a_s^*}
-{\beta\gamma_{ss}\pi(a_s^*)}.
-\end{align*}
-However, while the middle-aged worker inherits a guaranteed portion of the senior worker surplus per the probability weighting of their problem, the relative search effort remains ambiguous. Altogether, we can write the fixed-point equation for $\lbar{w}_m$ as:
-\begin{align*}
-\lbar{w}_m
-=
-& \;b-\psi a^*_m
-+\tilde V_s(\lbar w_s)-\tilde V_s(\lbar w_m) \\
-&\quad
-+\frac{\beta\gamma_{mm}\pi(a^*_m)}
-{1-\beta\gamma_{mm}(1-\delta)}
-\int_{\lbar{w}_m}^{\infty}
-\Bigl[
-w-\lbar{w}_m+\tilde V_s(w)-\tilde V_s(\lbar{w}_m)
-\Bigr]\,dF(w) \\
-&\quad
-+\frac{\beta(1-\gamma_{mm})\pi(a^*_m)}
-{1-\beta\gamma_{ss}(1-\delta)}
-\int_{\lbar{w}_s}^{\infty}
-(w-\lbar{w}_s)\,dF(w)
-\end{align*}
-Once more, the resulting size of the reservation wage of middle-aged worker relative to that of a senior worker remains ambiguous. In particular, due to the increased search effort, this reduces the base net flow value. Furthermore, while the gains of a higher wage push up the potential future horizon payoffs, this also means that jobs at a lower wages have higher payoffs due to their increased time horizon.
+The two summands inside the logarithm reflect the two possible age states next period. The first term corresponds to the case in which the worker remains middle-aged. In that state, an acceptable offer generates both the direct wage surplus above $\lbar{w}_m$ and the additional senior continuation value from carrying a higher wage into the future. The second term corresponds to the case in which the worker transitions into seniority, in which case the relevant surplus is measured relative to the senior reservation wage and valued using the senior continuation factor.
 
-Finally, we solve the case of the young worker by drawing upon the symmetry of the recursion. In particular:
-\begin{align*}
+Hence, middle-aged search effort depends on more than the immediate return to a wage draw. The same current search effort affects the probability of receiving an offer, but the value of that offer depends on whether the worker remains middle-aged or ages into seniority. Consequently, neither $a_m^*$ nor $\lbar w_m$ can be ranked unambiguously relative to their senior counterparts. A longer effective horizon and the seniority continuation value may raise the value of accepting work in middle age, while higher search effort lowers the unemployment flow payoff through $\psi a_m^*$.
+
+Moreover, the continuation-value term can be summarized as a premium on the middle-aged wage surplus. In particular:\footnote{See Appendix~\ref{app:solver_simplification}, especially Section~\ref{app:middle_surplus}, for the derivation of $B_s$.}
+\[
+\int_{\lbar w_m}^{\infty}
+\left[
+w-\lbar w_m+\tilde V_s(w)-\tilde V_s(\lbar w_m)
+\right]\,dF(w)
+=
+(1+B_s)
+\int_{\lbar w_m}^{\infty}
+(w-\lbar w_m)\,dF(w),
+\]
+where:
+\[
+B_s
+=
+\frac{\beta(1-\gamma_{mm})(1-\delta)}
+{1-\beta\gamma_{ss}(1-\delta)}
+>0.
+\]
+Thus, the senior continuation channel amplifies each unit of middle-aged wage surplus by the factor $1+B_s$. The coefficient $B_s$ can therefore be interpreted as a seniority continuation premium. It converts each unit of middle-aged wage surplus into an additional present value generated by the possibility of carrying that wage into seniority. In the fixed-point equation for $\lbar w_m$, this premium raises the value of acceptable middle-aged offers; in the search-effort condition, it raises the marginal expected benefit of search. Thus, middle-aged workers may search more intensively than seniors not simply because they receive higher wage draws, but because each acceptable draw has an additional continuation value attached to the future senior state.
+
+To establish existence and uniqueness, define the right-hand side of the middle-aged fixed-point equation as the function $T_m$, after substituting in the optimal search effort $a_m^*(\lbar w_m)$ and taking the senior objects as already determined. Under the maintained assumptions that $F$ is continuous and that the optimal search policy $a_m^*(\lbar w_m)$ is continuous, $T_m$ is continuous. Define the residual
+\[
+\Psi_m(\lbar w_m)\doteq \lbar w_m-T_m(\lbar w_m).
+\]
+As $\lbar w_m\to\infty$, the expected-surplus term associated with acceptable middle-aged offers vanishes, while the left-hand side grows without bound; hence $\Psi_m(\lbar w_m)\to\infty$. Conversely, as $\lbar w_m\to-\infty$, the expected surplus from acceptable middle-aged offers grows without bound. Since the continuation premium enters as the positive multiplier $1+B_s$, the right-hand side eventually exceeds $\lbar w_m$, so $\Psi_m(\lbar w_m)<0$ for sufficiently low $\lbar w_m$. Hence, by continuity, the residual crosses zero.
+
+For uniqueness, note that at an interior optimum the envelope theorem removes the indirect effect of $\lbar w_m$ through $a_m^*(\lbar w_m)$. As shown above, the senior continuation value is affine in the wage, so we may write
+\[
+\tilde V_s(w)=A_s+B_sw,
+\]
+where $A_s$ and $B_s$ are constants with $B_s>0$. Correspondingly, define the gain term entering the middle-aged search problem by
+\[
+\mathcal G_m(\lbar w_m)
+\doteq
+\frac{\beta\gamma_{mm}}{1-\beta\gamma_{mm}(1-\delta)}
+(1+B_s)R(\lbar w_m)
++
+\frac{\beta(1-\gamma_{mm})}{1-\beta\gamma_{ss}(1-\delta)}R(\lbar w_s).
+\]
+Since
+\[
+R'(x)=-(1-F(x)),
+\]
+it follows that
+\[
+\mathcal G_m'(\lbar w_m)
+=
+-\frac{\beta\gamma_{mm}}{1-\beta\gamma_{mm}(1-\delta)}
+(1+B_s)(1-F(\lbar w_m))
+<0.
+\]
+Therefore,
+\[
+T_m'(\lbar w_m)
+=
+-B_s+\pi(a_m^*,\phi)\mathcal G_m'(\lbar w_m)
+<0,
+\]
+so the residual is strictly increasing:
+\[
+\Psi_m'(\lbar w_m)=1-T_m'(\lbar w_m)>0.
+\]
+Hence the middle-aged reservation wage is unique at the interior. At the corner, where $a_m^*=0$, the offer-surplus term drops out and $T_m(\cdot)$ remains strictly decreasing because $\tilde V_s$ is affine with positive slope, so uniqueness continues to hold.
+
+
+\paragraph{The young worker's problem.}
+We draw on the parallel structure of the recursion to solve the young worker's problem. As in the middle-aged case, a young worker must consider both the continuation value of remaining in the same age cohort and the continuation value associated with transitioning into the next age cohort. The difference is that the young worker's continuation value is one step further removed: accepting a job while young affects the value of entering middle age while employed, and the middle-aged value itself already embeds the possibility of eventually transitioning into seniority.
+
+Let $\tilde V_m(w)$ denote the present discounted continuation value associated with transitioning into middle age while employed at wage $w$. The fixed-point equation for the young reservation wage can then be written as
+\begin{align}
 \lbar{w}_j
 =
 b-\psi a_j^*
-&+\tilde V_m(\lbar w_m)-\tilde V_m(\lbar w_j)\\
+&+\tilde V_m(\lbar w_m)-\tilde V_m(\lbar w_j)
+\nonumber\\
 &+\frac{\beta\gamma_{jj}\pi(a_j^*)}
 {1-\beta\gamma_{jj}(1-\delta)}
 \int_{\lbar{w}_j}^{\infty}
 \Bigl[
 w-\lbar{w}_j+\tilde V_m(w)-\tilde V_m(\lbar{w}_j)
-\Bigr]\,dF(w)\\
+\Bigr]\,dF(w)
+\nonumber\\
 &+\frac{\beta(1-\gamma_{jj})\pi(a_j^*)}
 {1-\beta\gamma_{mm}(1-\delta)}
 \int_{\lbar{w}_m}^{\infty}
 \Bigl[
 w-\lbar{w}_m+\tilde V_s(w)-\tilde V_s(\lbar{w}_m)
-\Bigr]\,dF(w)
-\end{align*}
-\begin{align*}
+\Bigr]\,dF(w).
+~\label{eq:wj_fixed_point}
+\end{align}
+The associated optimal search effort is:
+\begin{align}
 a_j^*
 =
 \max\Biggl\{
 0,\,
-\frac{1}{\phi}&
+\frac{1}{\phi}
 \ln\Biggl(
-\frac{\phi}{\psi}
+&\frac{\phi}{\psi}
 \biggl[
-\frac{\beta\gamma_{jj}}
-{1-\beta\gamma_{jj}(1-\delta)}
-\int_{\lbar{w}_j}^{\infty}
+\beta\gamma_{jj}\frac{\int_{\lbar{w}_j}^{\infty}
 \Bigl[
 w-\lbar{w}_j+\tilde V_m(w)-\tilde V_m(\lbar{w}_j)
-\Bigr]\,dF(w)\\
+\Bigr]\,dF(w)}
+{1-\beta\gamma_{jj}(1-\delta)}
+\nonumber\\
 &+
-\frac{\beta(1-\gamma_{jj})}
-{1-\beta\gamma_{mm}(1-\delta)}
-\int_{\lbar{w}_m}^{\infty}
+\beta(1-\gamma_{jj})\frac{\int_{\lbar{w}_m}^{\infty}
 \Bigl[
 w-\lbar{w}_m+\tilde V_s(w)-\tilde V_s(\lbar{w}_m)
-\Bigr]\,dF(w)
+\Bigr]\,dF(w)}
+{1-\beta\gamma_{mm}(1-\delta)}
 \biggr]
 \Biggr)
-\Biggr\}
-\end{align*}
-As before, the search effort of the young worker is ambiguous with respect to that of the middle-aged worker, as is the effect on their reservation wage.
-\medskip
+\Biggr\}.
+\label{eq:aj_star}
+\end{align}
+The two terms inside the logarithm reflect the two possible age states in the following period. The first term corresponds to the case in which the worker remains young. In that event, an acceptable offer generates a direct wage surplus, $w-\lbar w_j$, together with the change in the continuation value from carrying that wage into middle age, $\tilde V_m(w)-\tilde V_m(\lbar w_j)$. The second term corresponds to the case in which the worker transitions into middle age in the following period. In that case, the relevant surplus is evaluated using the middle-aged reservation wage and the middle-aged continuation value, which already incorporates the possibility of later entering seniority.
 
-%Turning to the evolution of the system more globally, we note that a worker is young for an average of $10$ years, middle-aged for $25$, and senior for $5$, hence participating in the labour force for an average of $40$ years. It follows that, at the stationary distribution, the proportion of workers in each age cohort must be $0.25$, $0.625$, and $0.125$ respectively.
-Turning to the evolution of the system more globally, we note that per the representations of the age cohorts, a worker is in age cohort $g$ for duration $d_g$. It follows that, at the stationary distribution, we can define the proportion of workers in a given age cohort by:
+Thus, the young worker's problem inherits the continuation structure of the middle-aged problem recursively. A wage accepted while young may generate value over a longer future horizon, since it can affect employment value in middle age and, through that channel, in seniority. This gives young workers an additional continuation-value motive for search. However, the ranking of search effort across age groups remains ambiguous, since the longer horizon is offset by differences in reservation wages, transition probabilities, and the endogenous cost of search effort.
+
+Existence and uniqueness follow by analogous logic. Let the right-hand side of~\eqref{eq:wj_fixed_point}, after substituting in the optimal search policy $a_j^*(\lbar w_j)$, be denoted by $T_j(\lbar w_j)$, and define the residual
+\[
+\Psi_j(\lbar w_j)\doteq \lbar w_j-T_j(\lbar w_j).
+\]
+Under the maintained assumptions that $F$ is continuous and that $a_j^*(\lbar w_j)$ is continuous, $\Psi_j$ is continuous. As $\lbar w_j\to\infty$, the expected-surplus terms vanish, while the left-hand side grows without bound; hence $\Psi_j(\lbar w_j)\to\infty$. Conversely, as $\lbar w_j\to-\infty$, the expected surplus from acceptable young offers grows without bound. Since this surplus enters $T_j$ positively, the right-hand side eventually exceeds $\lbar w_j$, so $\Psi_j(\lbar w_j)<0$ for sufficiently low $\lbar w_j$. Hence, by the intermediate value theorem, a fixed point exists.
+
+For uniqueness, the envelope theorem again removes the indirect effect of $\lbar w_j$ through $a_j^*(\lbar w_j)$ at an interior optimum. As shown in the appendix, the middle-aged continuation value is affine in the wage, so we may write
+\[
+\tilde V_m(w)=A_m+B_mw,
+\]
+where $A_m$ and $B_m$ are constants with $B_m>0$. Define the corresponding young gain term by
+\[
+\mathcal G_j(\lbar w_j)
+\doteq
+\frac{\beta\gamma_{jj}}{1-\beta\gamma_{jj}(1-\delta)}
+(1+B_m)R(\lbar w_j)
++
+\frac{\beta(1-\gamma_{jj})}{1-\beta\gamma_{mm}(1-\delta)}
+(1+B_s)R(\lbar w_m).
+\]
+Therefore
+\[
+\mathcal G_j'(\lbar w_j)
+=
+-\frac{\beta\gamma_{jj}}{1-\beta\gamma_{jj}(1-\delta)}
+(1+B_m)(1-F(\lbar w_j))
+<0.
+\]
+It follows that
+\[
+T_j'(\lbar w_j)
+=
+-B_m+\pi(a_j^*,\phi)\mathcal G_j'(\lbar w_j)
+<0,
+\]
+and therefore
+\[
+\Psi_j'(\lbar w_j)=1-T_j'(\lbar w_j)>0.
+\]
+Hence the interior young reservation wage is unique. At the corner solution, where $a_j^*=0$, the offer-surplus terms disappear and $T_j(\cdot)$ remains strictly decreasing because $\tilde V_m$ is affine with positive slope, so uniqueness again follows.
+
+\subsection{The Flow Equilibrium}
+
+\paragraph{State durations and Transition Probabilities}
+We denote by $d_g$ the expected duration of a worker in age cohort $g$. Under a stationary demographic structure, we can then derive the long run proportion of workers in a given age cohort $g$ by:
+
 \[
 n_g\doteq\frac{d_g}{d_j+d_m+d_s}\quad\forall g\in\{j,m,s\}
 \]
-More generally, the expected length of time an agent stays in a certain age cohort is:
+In probabilistic terms, the expected duration an agent stays in a certain age cohort is:
 \[
-\mathbb{E}[T_g]=\sum^\infty_{t=1}t\gamma_{gg}^{t-1}(1-\gamma_{gg})
+d_g=\sum^\infty_{t=1}t\gamma_{gg}^{t-1}(1-\gamma_{gg}),
 \]
-where we weight each time duration $t$ by the probability that they stay for precisely $t$, an and hence must leave in the next period. Solving the geometric series we obtain:
+where we weight each time duration $t$ by the probability that they stay for precisely $t$, and hence must leave in the next period. Solving this geometric series we obtain:
+
 \[
 \mathbb{E}[T_g]=\frac{1}{1-\gamma_{gg}}
 \]
-It follows that the transition probabilities are therefore given by:
-\begin{comment}
-\begin{align*}
-10=\frac{1}{1-\gamma_{jj}},\quad 
-25=\frac{1}{1-\gamma_{mm}},\quad 
-5=\frac{1}{1-\gamma_{ss}}\\
-\gamma_{jj}=0.9,\quad
-\gamma_{mm}=0.96,\quad
-\gamma_{ss}=0.8
-\end{align*}
-\end{comment}
+
+It follows that the cohort durations and transition probabilities are given by:
 \begin{align*}
 d_j=\frac{1}{1-\gamma_{jj}},\quad 
 d_m=\frac{1}{1-\gamma_{mm}},\quad 
@@ -283,17 +486,21 @@ d_s=\frac{1}{1-\gamma_{ss}}\\
 \gamma_{mm}=\frac{d_m-1}{d_m},\quad
 \gamma_{ss}=\frac{d_s-1}{d_s}
 \end{align*}
-Putting everything together, let us denote the respective population weights of the unemployed within each cohort as $u_g$ for $g\in\{j,m,s\}$. Let $h_t$ denote our state vector of workers at $t$, hence given by:
+
+\paragraph{Equilibrium Unemployment}
+Putting everything together, let us denote the respective population weights of the unemployed within each cohort as $u_g$ for $g\in\{j,m,s\}$. Let $h_t$ denote our state vector of workers at $t$, given by
 \[
 h_t \doteq
 \bigl[(1-u_j),\, u_j,\, (1-u_m),\, u_m,\, (1-u_s),\, u_s\bigr]
-\bigl(\operatorname{diag}(n_j,n_m,n_s)\otimes I_2\bigr)
+\bigl(\operatorname{diag}(n_j,n_m,n_s)\otimes I_2\bigr),
 \]
-where each entry is weighted by the stationary population weight of its respective cohort. Furthermore, we note that a worker leaves unemployment, only if they both have an offer, and this offer is at a wage greater than their reservation wage in the period in which they can accept. Let us denote this by $p_g$ for each cohort such that:
+where each entry is weighted by the stationary population share of its respective cohort, once the stationary demographic structure is imposed.\footnote{The notation keeps $u_g$ as a within-cohort unemployment share, rather than absorbing the cohort weight into the unemployment variable itself. Strictly speaking, multiplying by the stationary cohort shares $n_g$ imposes the stationary demographic structure directly on $h_t$, and is not necessary for characterising transition dynamics. One could instead work with an unweighted vector of within-cohort employment and unemployment shares, introducing the cohort weights only when constructing aggregate population shares in steady state. We use the weighted representation as a steady-state normalization, so that $u_g$ retains its within-cohort interpretation while $n_g u_g$ gives the corresponding share of the total worker population.} Furthermore, we note that a worker leaves unemployment only if they receive a wage offer and that offer exceeds the reservation wage in the period in which it can be accepted (recall that the reservation wages may differ across age cohorts). Let us denote the corresponding job-finding probabilities by $p_{gg'}$:
 \[
 p_{gg'}\doteq\pi(a^*_g)(1-F(\lbar{w}_{g'}))
 \]
-Correspondingly, we denote the per-age labour-force transition matrix by:
+
+Correspondingly, we denote the per-age labour force transition matrix by:
+
 \[
 L_{gg'}
 \doteq
@@ -309,12 +516,28 @@ L_{jj} & L_{jm} & \mathbf{0} \\
 \mathbf{0} & \mathbf{0} & L_{ss}
 \end{bmatrix}.
 \]
-Hence, the full system evolves as:\footnote{The full matrix can be found in the appendix. In effect, the matrix is $6\times6$ with each odd row for employed workers at $t$ and each even row for unemployed workers at $t$, with the age cohort increasing every odd row, as one goes down the matrix.}
+The full system evolves as follows:
 \begin{align*}
 h_{t+1}&=h_t\bigr[\bigl((\Gamma\otimes\mathbf{1}_{2\times 2})\odot\mathcal{L}\bigr)+(1-\gamma_{ss})\bigl((e_s e_j')\otimes(\mathbf 1_2 e_u')\bigr)\bigl]\\
 &=h_t\Pi
 \end{align*}
-where:\footnote{In particular, these elementary column vectors and the vector of $1$s combine to produce:
+
+This expression can be interpreted as follows. To obtain $h_{t+1}$, we multiply $h_t$ by a constructed transition matrix, which we denote as $\Pi$. The first set of terms in $\Pi$ defines a $6\times6$ matrix comprised of the respective age and employment-state transitions, and the second set of terms converts the exiting mass of senior employed and unemployed workers into unemployed young workers with probability $1-\gamma_{ss}$.\footnote{The full matrix can be found in the appendix. In effect, the matrix is $6\times6$ with each odd row for employed workers at $t$ and each even row for unemployed workers at $t$, with the age cohort increasing every odd row, as one goes down the matrix.} where the elementary column vectors and the vector of $1$s are:
+
+\[
+e_j\doteq
+\begin{bmatrix}1\\0\\0\end{bmatrix},
+\qquad
+e_s\doteq
+\begin{bmatrix}0\\0\\1\end{bmatrix},
+\qquad
+e_u\doteq
+\begin{bmatrix}0\\1\end{bmatrix},
+\qquad
+\mathbf 1_2=
+\begin{bmatrix}1\\1\end{bmatrix},
+\]
+combine to produce:
 \[
 \begin{bmatrix}
 0 & 0 & 0 & 0 & 0 & 0 \\
@@ -323,37 +546,28 @@ where:\footnote{In particular, these elementary column vectors and the vector of
 0 & 0 & 0 & 0 & 0 & 0 \\
 0 & 1 & 0 & 0 & 0 & 0 \\
 0 & 1 & 0 & 0 & 0 & 0 \\
-\end{bmatrix}
+\end{bmatrix},
 \]
-which takes the last two entries of $h_t$ corresponding to the old age cohort (and hence the bottom two rows in the matrix), and sends them both to the unemployed young cohort at $t+1$, given by the second column.}
-\[
-e_j=
-\begin{bmatrix}1\\0\\0\end{bmatrix},
-\qquad
-e_s=
-\begin{bmatrix}0\\0\\1\end{bmatrix},
-\qquad
-e_u=
-\begin{bmatrix}0\\1\end{bmatrix},
-\qquad
-\mathbf 1_2=
-\begin{bmatrix}1\\1\end{bmatrix}.
-\]
-In effect, to obtain $h_{t+1}$, we multiply $H_t$ by a constructed transition matrix, which we denote as $\Pi$, where the first set of terms defines a $6\times6$ matrix comprised of the respective age and labour-state transitions, and the second set of terms sends the senior employed and unemployed workers into unemployed young workers with probability $1-\gamma_{ss}$. Since $\Pi$ is finite and row-stochastic, a stationary distribution $h^*$ exists such that:
-\[
-h^*=h^*\Pi
-\]
-In particular, under the usual positivity conditions ensuring irreducibility and aperiodicity, the system converges to it from any initial distribution. In effect, $h^*$ is the normalised row eigenvector of $\Pi$ with eigenvalue $1$.
+which takes the last two entries of $h_t$ corresponding to the old age cohort (and hence the bottom two rows in the matrix), and converts them both to the unemployed young cohort at $t+1$, given by the second column.
 
-Taking a more explicit analytic approach for this exposition, we get the following analytic formulae for the age-cohort-specific laws of motion, dictating the flows in and out of unemployment:
+
+Since $\Pi$ is finite and row-stochastic, a stationary distribution $h^*$ exists such that:
+\[
+h^*=h^*\Pi.
+\]
+
+Under the usual positivity conditions ensuring irreducibility and aperiodicity, the system converges to the stationary distribution from any initial distribution. Hence, $h^*$ is our vector denoting the population masses of each age-employment type in equilibrium. In effect, $h^*$ is the normalised row eigenvector of $\Pi$ with eigenvalue $1$.
+
+Taking a more explicit analytic approach for this exposition, we state the following analytic formulae for the age-cohort-specific laws of motion, dictating the flows in and out of unemployment:
 \begin{align*}
 u_j'=&\;\gamma_{jj}\bigl((1-p_{jj})u_j+\delta(1-u_j))\bigr) + \frac{n_s}{n_j}(1-\gamma_{ss})\\
 u_m'=&\;\gamma_{mm}\bigl((1-p_{mm})u_m+\delta(1-u_m))\bigr)\\
 &+\frac{n_j}{n_m}(1-\gamma_{jj})\bigl((1-p_{jm})u_j+\delta(1-u_j))\bigr)\\
 u'_s=&\;\gamma_{ss}\bigl((1-p_{ss})u_s+\delta(1-u_s))\bigr)\\
-&+\frac{n_m}{n_s}(1-\gamma_{mm})\bigl((1-p_{ms})u_m+\delta(1-u_m))\bigr)\\
+&+\frac{n_m}{n_s}(1-\gamma_{mm})\bigl((1-p_{ms})u_m+\delta(1-u_m))\bigr)
 \end{align*}
-Since these values are constant between periods in equilibrium, we can solve recursively starting at the unemployment rate of the young to get:
+
+The flow equilibrium is characterized by workers (of all ages) entering unemployment in a given period, enlarging the pool from which workers can enter employment in the next period, which in turn enlarges the pool of workers who may enter unemployment in the period after that. Since these values are constant between periods in equilibrium, we can solve recursively starting at the unemployment rate of the young to obtain:
 \begin{align*}
 u_j^*&=\frac{\gamma_{jj}\delta+\frac{n_s}{n_j}(1-\gamma_{ss})}{1-\gamma_{jj}(1-\delta-p_{jj})}\\
 u_m^*&=\frac{\gamma_{mm}\delta+\frac{n_j}{n_m}(1-\gamma_{jj})\left[\delta+(1-\delta-p_{jm})u_j^*\right]}{
@@ -362,7 +576,7 @@ u_s^*&=\frac{\gamma_{ss}\delta+\frac{n_m}{n_s}(1-\gamma_{mm})\left[
 \delta+(1-\delta-p_{ms})u_m^*\right]}
 {1-\gamma_{ss}(1-\delta-p_{ss})}
 \end{align*}
-Alternatively, solving in term of employment shares:
+Alternatively, solving in terms of employment shares:
 \begin{align*}
 1-u_j'
 =&\;
@@ -414,13 +628,15 @@ Solving at equilibrium, we have:
 }
 {1-\gamma_{ss}(1-\delta-p_{ss})}.
 \end{align*}
-In particular, we note that our two derivations provide the same values of $u^*_g$, $\forall g\in\{j,m,s\}$, since, per our age transition probabilities:\footnote{To see this even more clearly, note that $\frac{n_g}{n_g'}=\frac{d_g}{d_g'}$. Hence:
+
+We note that our two derivations provide the same values of $u^*_g$, $\forall g\in\{j,m,s\}$, since, per our age transition probabilities,\footnote{To see this even more clearly, note that $\frac{n_g}{n_g'}=\frac{d_g}{d_g'}$. Hence:
 \[
     \frac{n_s}{n_j}=\frac{1-\gamma_{jj}}{1-\gamma_{ss}},\quad
     \frac{n_j}{n_m}=\frac{1-\gamma_{mm}}{1-\gamma_{jj}},\quad
     \frac{n_m}{n_s}=\frac{1-\gamma_{ss}}{1-\gamma_{mm}}
 \]
-}
+} % end of footnote
+
 \[
 \frac{n_s}{n_j}(1-\gamma_{ss})
 =
@@ -434,48 +650,201 @@ In particular, we note that our two derivations provide the same values of $u^*_
 =
 1-\gamma_{ss}.
 \]
-\medskip\\
-\noindent Before proceeding to the numerical methods section, we also deduce an expression for $G(w)$, the distribution of wages paid. In particular, since for a given age cohort $g\in\{j,m,s\}$, wages are only realised upon acceptance, the wage distribution coincides with the distribution of accepted offers, which is in turn a left-truncated distribution of $F(w)$. We note that:
+\par\smallskip
+
+\paragraph{The distribution of wages.} Before proceeding to the numerical solution, we also deduce an expression for $G(w)$, the distribution of wages paid. 
+
+We first derive the distribution of accepted offers, which we regard as a left-truncated distribution of $F(w)$. We note that:
 \[
-\mathbb{P}(W\leq w| W \geq \lbar{w}_g)=\frac{\mathbb{P}(\lbar{w}_g\leq W\leq w)}{\mathbb{P}(W\geq \lbar{w}_g)}=\frac{F(w)-F(\lbar{w}_g)}{1-F(\lbar{w}_g)}
+\mathbb{P}(W\leq w| W \geq \lbar{w}_{g'})=\frac{\mathbb{P}(\lbar{w}_{g'}\leq W\leq w)}{\mathbb{P}(W\geq \lbar{w}_{g'})}=\frac{F(w)-F(\lbar{w}_{g'})}{1-F(\lbar{w}_{g'})}
 \]
-So, the corresponding wage distribution for $g$ is:
+Thus, the corresponding distribution of accepted wages for workers in age cohort $g$ in period $t$ and $g'$ in period $t+1$ is:
 \[
-G_g(w)=
+A_{gg'}(w)=
 \begin{cases}
-    0,\quad &w<\lbar{w}_g\\
-    \frac{F(w)-F(\lbar{w}_g)}{1-F(\lbar{w}_g)},
-    \quad &w\geq\lbar{w}_g
+    0,\quad &w<\lbar{w}_{g'}\\
+    \frac{F(w)-F(\lbar{w}_{g'})}{1-F(\lbar{w}_{g'})},
+    \quad &w\geq\lbar{w}_{g'}
 \end{cases}
 \]
-Finally, aggregating across cohorts, the distribution of wages among employed workers is:
+Each period, the distribution of wages paid for each cohort $G_g$ is affected due to: (i) exits from the age cohort; (ii) exits due to unemployment, (iii) entries from unemployment (per the respective accepted wage distribution), (iv) entries from the employed younger cohorts. Consequently, at each period, for each age cohort, we must have:
+\begin{align*}
+(1-u_j)G_j'(w)=&\;\gamma_{jj}\bigl[(1-u_j)(1-\delta)G_j(w)+u_jp_{jj}A_{jj}(w)\bigr]\\
+(1-u_m)G_m'(w)=&\;\gamma_{mm}\bigl[(1-u_m)(1-\delta)G_m(w)+u_mp_{mm}A_{mm}(w)\bigr]\\
+&+\frac{n_j}{n_m}(1-\gamma_{jj})\bigl[(1-u_j)(1-\delta)G_j(w)+u_jp_{jm}A_{jm}(w)\bigr]\\
+(1-u_s)G_s'(w)=&\;\gamma_{ss}\bigl[(1-u_s)(1-\delta)G_s(w)+u_sp_{ss}A_{ss}(w)\bigr]\\
+&+\frac{n_m}{n_s}(1-\gamma_{mm})\bigl[(1-u_m)(1-\delta)G_m(w)+u_mp_{ms}A_{ms}(w)\bigr]
+\end{align*}
+In matrix form, we define:
+\begin{align*}
+D_e
+\doteq
+\operatorname{diag}(1-u_j,1-u_m,1-u_s),
+\qquad
+D_n
+\doteq
+\operatorname{diag}(n_j,n_m,n_s)\\
+\mathbf{G}(w)\doteq\bigl(G_j(w), G_m(w), G_s(w)\bigr)\qquad\qquad\qquad
+\end{align*}
+Substituting this into the stationary wage-distribution law gives:
+\begin{equation}
+\mathbf G'(w)
+=
+\mathbf G(w)D_e(1-\delta)D_n\Gamma D_n^{-1}D_e^{-1}
++
+uD_n
+\left(\Gamma\odot P\odot A(w)\right)
+D_n^{-1}D_e^{-1},
+~\label{eq:dist_evo}
+\end{equation}
+where $u\doteq(u_j,u_m,u_s)$, and:
 \[
-G(w)=\frac{\sum_{g\in\{j,m,s\}} n_gG_g(w)}{\sum_{g\in\{j,m,s\} n_g(1-u_g^*)}}
+P\doteq
+\begin{bmatrix}
+p_{jj} & p_{jm} & 0\\
+0 & p_{mm} & p_{ms}\\
+0 & 0 & p_{ss}
+\end{bmatrix},
+\qquad
+A(w)\doteq
+\begin{bmatrix}
+A_{jj}(w) & A_{jm}(w) & 0\\
+0 & A_{mm}(w) & A_{ms}(w)\\
+0 & 0 & A_{ss}(w)
+\end{bmatrix}.
 \]
+From~\eqref{eq:dist_evo}, we can see more clearly that the distribution of wages paid must also be stationary. In particular, the second term is constant over time since each of its constituent terms are stationary (as shown earlier). Writing
+\[
+M \doteq D_e(1-\delta)D_n\Gamma D_n^{-1}D_e^{-1},
+\]
+and
+\[
+B(w)\doteq uD_n
+\left(\Gamma\odot P\odot A(w)\right)
+D_n^{-1}D_e^{-1},
+\]
+the recursion becomes $\mathbf G'(w)=\mathbf G(w)M+B(w)$. Iterating forward gives:
+\begin{align*}
+\mathbf G^{(k)}(w)
+=&\;
+\mathbf G^{(0)}(w)M^k\\
+&+
+B(w)\sum_{\ell=0}^{k-1}M^\ell.
+\end{align*}
+However, $M$ has spectral radius less than $1$. It follows that $I_3-M$ is invertible, so the geometric series converges as $k\to\infty$, giving:
+\[
+\mathbf{G}^*(w)=uD_n
+\left(\Gamma\odot P\odot A(w)\right)
+D_n^{-1}D_e^{-1}
+\left[
+I_3-D_e(1-\delta)D_n\Gamma D_n^{-1}D_e^{-1}
+\right]^{-1}.
+\]
+Hence, there exists a stationary distribution of wages paid. Solving recursively, we obtain:
+\begin{align*}
+G_j^*(w)
+&=
+\frac{
+\gamma_{jj}u_j^*p_{jj}A_{jj}(w)
+}{
+(1-u_j^*)\left[1-\gamma_{jj}(1-\delta)\right]
+},
+\\
+G_m^*(w)
+&=
+\frac{
+\gamma_{mm}u_m^*p_{mm}A_{mm}(w)
++\frac{n_j}{n_m}(1-\gamma_{jj})
+\left[
+(1-u_j^*)(1-\delta)G_j(w)+u_j^*p_{jm}A_{jm}(w)
+\right]
+}{
+(1-u_m^*)\left[1-\gamma_{mm}(1-\delta)\right]
+},
+\\
+G_s^*(w)
+&=
+\frac{
+\gamma_{ss}u_s^*p_{ss}A_{ss}(w)
++\frac{n_m}{n_s}(1-\gamma_{mm})
+\left[
+(1-u_m^*)(1-\delta)G_m(w)+u_m^*p_{ms}A_{ms}(w)
+\right]
+}{
+(1-u_s^*)\left[1-\gamma_{ss}(1-\delta)\right]
+}.
+\end{align*}
+Finally, the aggregate distribution of wages paid is then obtained by weighting the cohort-specific paid-wage distributions by each cohort's employed population
+mass:
+\begin{align*}
+G(w)
+&=
+\frac{
+\sum_{g\in\{j,m,s\}} n_g(1-u_g^*)G_g^*(w)
+}{
+\sum_{g\in\{j,m,s\}} n_g(1-u_g^*)
+}\\
+&=\frac{\mathbf{G}^*(w)\cdot[n\odot(\mathbf{1}'_3-u^*)]}{n\cdot(\mathbf{1}'_3-u^*)}
+\end{align*}
+where we let $n\doteq(n_j,n_m,n_s)$.
+
+Consequently, the aggregate paid-wage distribution $G(w)$ is a mixture of
+cohort-specific stock distributions rather than a mixture of cohort-specific
+truncated offer distributions. Selection through reservation wages still shifts
+$G(w)$ relative to the offer distribution $F(w)$, but the shape of $G(w)$
+also reflects the persistence of accepted wages across age transitions and the
+equilibrium age-employment composition of the labour force.
+
+The possibility of bumps or shoulders in $G(w)$ remains, but the mechanism is
+richer than simple truncation. Since employed middle-aged and senior workers may
+carry wages accepted in earlier cohorts, the aggregate distribution reflects a
+mixture of wage vintages. Kinks or changes in slope may therefore arise both
+from current reservation thresholds and from the inherited composition of wages
+accepted at earlier ages.
+
 \section{Numerical Solution}
-Given our expressions we solve the equilibrium recursively, starting at the senior problem. In our particular case, we first define a set of bounds for $\phi$, starting with an initial intermediate guess, and use a root-finding algorithm to produce the next guess of $\phi$, after having recursively having solved for the reservation wages.
+
+\subsection{Calibration and Numerical Strategy}
+
+Since solving analytically only provides implicit solutions due to the nature of the fixed-point reservation wage equations, we solve numerically to observe how the forces acting upon the model resolve in equilibrium at the given parameter values and calibration.
+
+\paragraph{Age-transition probabilities.} Given expressions above, we solve the equilibrium recursively, starting with the senior problem. We first define a set of bounds for $\phi$, starting with an initial intermediate guess, and use a root-finding algorithm to produce the next guess of $\phi$, after having recursively having solved for the reservation wages.
 
 To begin, we first infer that the each $t$ corresponds to a month. Hence, to compute the values of $\gamma_{gg}$, $\forall g\in\{j,m,s\}$. Since an individual is on average young for 10 years, middle-aged for 25, and senior for 5, we can multiply each of these values by 12 and solve to get:
 \[
 \gamma_{jj}=\frac{119}{120},\quad\gamma_{mm}=\frac{299}{300},\quad\gamma_{ss}=\frac{59}{60}
 \]
-We note that once a middle-aged worker is unemployed, the duration spent in the middle-aged unemployed state ends either because they find an acceptable job while remaining middle-aged, or because they age into the senior cohort. Hence, the per-period exit probability from middle-aged unemployment is:
+
+\paragraph{Unemployment-duration target.} We interpret the target as the average duration of a spell in middle-aged unemployment. Such a spell ends either when the worker finds an acceptable job while remaining middle-aged, or when the worker ages into the senior cohort. Hence, the per-period exit probability from middle-aged unemployment is:
 \[
-\gamma_{mm}\pi(a^*_m)(1-F(\lbar{w}_m))+(1-\gamma_{mm})
+q_m=\gamma_{mm}p_{mm}+(1-\gamma_{mm}).
 \]
-using this interpretation for our calibration, it follows from the geometric distribution that the average duration spent unemployed while middle-aged is:
+Since the middle-aged unemployment spell ends with constant probability $q_m$ each period, its duration is geometrically distributed, with expected value:
 \[
-13=\frac{1}{\gamma_{mm}\pi(a^*_m)(1-F(\lbar{w}_m))+(1-\gamma_{mm})}
+d_{u,m}=\frac{1}{q_m}.
 \]
-Since $a_m^*$ (and $\lbar{w}_m$) depend on $\phi$, we solve for $\phi$ by treating the above condition as a scalar equation. As an initialisation, we take a small positive lower bound for $\phi$ and construct an upper bound via geometric expansion, starting at $1$. For the purposes of this solution, we restrict our search to a unique $\phi$,\footnote{The uniqueness of $\phi$ can only be guaranteed by numerical solution. In the appendix, we plot our root-finding residual on $\phi$ over a large range of values, strongly suggesting a unique solution.} which we find by first expanding our upper-bracket geometrically until the right-hand-side of the above equation provides a value below 13. After this, we solve on our interval using Brent's method.\footnote{This relies upon the implicit assumption that the number of iterations to find the crossing point is small, such that the time saved using the super-linear convergence of Brent outweighs Picard iteration. For a discussion on why Brent is chosen over safeguarded Newton-Raphson, see the appendix.}
+Using this interpretation for the calibration, the target average unemployment duration of 13 months implies:
+\begin{equation}
+13
+=
+\frac{1}{\gamma_{mm}p_{mm}+(1-\gamma_{mm})}.
+~\label{eq:phi_calib_scalar}
+\end{equation}
+where, as we recall, $p_{mm}$ is a function of the middle-aged optimal search effort $a^*_m$, which depends in turn on $\phi$.
 
-For each candidate value of $\phi$, we solve the reservation wages using a safeguarded Newton-Raphson method.\footnote{For a longer discussion on our choice of solution method, and a broader explanation of how it is implemented, see the appendix.} Since the average middle-aged unemployment duration depends only on $\lbar{w}_s$ and $\lbar{w}_m$, we solve for these sequentially:\footnote{To make the code solve in a more streamlined manner, some of the fixed-point formulae were re-arranged, please check the appendix to see these versions.} first $\lbar{w}_s$, and then $\lbar{w}_m$, reflecting the dependence of the latter on the former. 
+\paragraph{Root-finding procedure.} Since $a_m^*, a^*_s$ (and $\lbar{w}_m,\lbar{w}_s$) depend on $\phi$, we solve for $\phi$ by treating~\eqref{eq:phi_calib_scalar} as a scalar equation. As an initialisation, we note that our solution for $a^*_g$ is explosive when $\phi=0$. Hence, we take a positive lower bound a suitable small `error' term above this, and construct an upper bound for $\phi$ via geometric expansion, starting at $1$. For the purposes of this solution, we restrict our search to a unique $\phi$,\footnote{The uniqueness of $\phi$ can only be guaranteed by numerical solution. See Appendix~\ref{app:calibration_phi}, especially Section~\ref{app:calibration_residual_check}, for the residual plot.} which we find by first expanding our upper-bracket geometrically until the right-hand-side of the above equation provides a value below 13. After this, we solve on our interval using Brent's method.\footnote{For the choice of Brent's method over safeguarded Newton-Raphson, see Appendix~\ref{app:solution_method}.}
 
-Given these values, we compute the implied average middle-aged unemployment duration and evaluate the calibration residual. The value of $\phi$ is then updated using Brent's method.
+For each candidate value of $\phi$, we solve the reservation-wage fixed points using a Brent-type bracketing method applied to the corresponding residual equations. For each cohort $g$, define
+\[
+\Psi_g(\lbar w_g;\phi)\doteq \lbar w_g-T_g(\lbar w_g;\phi),
+\]
+where $T_g$ denotes the right-hand side of the corresponding reservation-wage equation after substituting the optimal search policy. Since the fixed-point equations are scalar and the residuals are continuous under the maintained assumptions, a bracketed root-finding method is well suited to the problem. We solve recursively: first $\lbar w_s$, then $\lbar w_m$, and finally $\lbar w_j$, reflecting the dependence of younger cohorts on the continuation values of older cohorts.\footnote{For a longer discussion of the solution method, see Appendix~\ref{app:solution_method}.} Since the average middle-aged unemployment duration depends only on $\lbar{w}_s$ and $\lbar{w}_m$, we solve for these sequentially:\footnote{For the algebraic rearrangements used in the MATLAB implementation, see Appendix~\ref{app:solver_simplification}.} first $\lbar{w}_s$, and then $\lbar{w}_m$, reflecting the dependence of the latter on the former. 
 
-Once we obtain a value of $\phi$ that brings the calibration residual within a prescribed tolerance, we solve for the remaining equilibrium objects, in particular the full set of reservation wages and the steady-state employment shares, which are then used to construct $G(w)$. 
+Given these reservation wages, we compute the implied average middle-aged unemployment duration and evaluate the calibration residual. The outer calibration equation in $\phi$ is also solved using a Brent-type method. In practice, we use MATLAB's \texttt{fzero}, which implements a safeguarded interpolation procedure combining bracketing with secant and inverse-quadratic interpolation steps.
 
-\subsection{Age, Research Effort, and Reservation Wage}
+Once we obtain a value of $\phi$ that brings the calibration residual within a prescribed tolerance, we solve for the remaining equilibrium objects of interest: the remaining reservation wage, $\lbar{w}_j$, and the steady-state employment shares, which are then used to construct $G(w)$. 
+
+\subsection{Age, Search Effort, and Reservation Wages}
 Solving at the given parameter values, we obtain a calibrated $\phi$ value of around $0.00055$. At equilibrium, we have the following reservation wages and search efforts for each age cohort:
 \begin{table}[!ht]
 \centering
@@ -489,19 +858,19 @@ Senior & 50 & 0 \\
 \hline
 \end{tabular}
 \caption{Calibrated reservation wages and search efforts by age cohort.}
-\label{tab:rwage_search_effort}
+~\label{tab:rwage_search_effort}
 \end{table}
 
-The search-effort ordering in Table~\ref{tab:rwage_search_effort} can be understood from the closed-form effort rules. Let $\mathcal G_g$ denote the expected gain term entering the effort choice of cohort $g$, so that:
+The search-effort ordering in Table~\ref{tab:rwage_search_effort} can be understood from the closed-form effort rules. Let $\mathcal G_g$ denote the expected marginal gain term entering the effort choice of cohort $g$, so that:
 \[
 a_g^*
 =
 \max\left\{
 0,\frac{1}{\phi}
-\log\left(\frac{\phi\mathcal G_g}{\psi}\right)
+\log\left(\frac{\phi}{\psi}\mathcal G_g\right)
 \right\}.
 \]
-Since the logarithm is increasing, search effort is increasing in $\mathcal G_g$ whenever the interior condition holds. The affine continuation-value terms help determine these gain terms. In particular, the middle-aged continuation integral can be written as:\footnote{See appendix for the derivation.}
+Since the logarithm is increasing, search effort is increasing in $\mathcal G_g$ whenever the interior condition holds. The affine continuation-value terms help determine these gain terms. To see this relationship, note that the middle-aged continuation integral can be written as:\footnote{See Appendix~\ref{app:solver_simplification}, especially Sections~\ref{app:middle_surplus} and \ref{app:young_surplus}, for the derivations.}
 \[
 \int_{\underline w_m}^{\infty}
 \left[
@@ -528,22 +897,23 @@ B_m
 {1-\beta\gamma_{mm}(1-\delta)}
 >0.
 \]
-Thus, a marginally higher wage offer is more valuable for younger workers because it raises not only current employment value, but also continuation values in later age states. This creates a force toward larger gain terms $\mathcal G_g$, and therefore higher search effort, for younger cohorts. In the calibrated solution, this force is strong enough that young workers choose the highest search effort, followed by middle-aged workers, while seniors remain at the corner.
+Thus, a marginally higher accepted wage is more valuable for younger workers because it raises not only the current employment surplus, but also the continuation values associated with later age states. This creates a force toward larger expected marginal gains from search, and therefore higher search effort, for younger cohorts whenever the interior condition holds. Specifically, in our calibrated solution, this force is strong enough that young workers choose the highest search effort, followed by middle-aged workers, while seniors remain at the corner.
 
-The reservation-wage ordering should be interpreted more cautiously. Higher search effort does not mechanically imply a higher reservation wage, because the reservation-wage fixed point also contains the flow search cost $-\psi a_g^*$ and the reservation wage itself changes the tail integrals. Hence the ranking of reservation wages is determined by the full fixed-point system rather than by the effort ordering alone. Numerically, however, the calibrated solution gives the same age ranking for reservation wages as for search efforts.
+The reservation-wage ordering should be interpreted more cautiously. Higher search effort does not mechanically imply a higher reservation wage, because the reservation-wage fixed point also contains the flow search cost $-\psi a_g^*$ and the reservation wage itself changes the tail integrals. Hence the ranking of reservation wages is determined by the full fixed-point system rather than by the effort ordering alone. In the calibrated solution, however, the continuation-value channel is strong enough that reservation wages inherit the same age ranking as search effort.
 
-For seniors, the calibrated solution is at a corner. Using our closed form expression for $a^*_s$ from our analytic section, the senior search rule implies positive search only if:
+For seniors, the calibrated solution is at a corner. Using our closed form expression for $a^*_s$ from our analytic characterisation, the senior search rule implies positive search only if:
 \[
-\frac{\phi\tilde\beta_sR(\underline w_s)}{\psi}>1,
+\frac{\phi}{\psi}\tilde\beta_s\int_{\lbar w_s}^{\infty}
+(w-\lbar w_s)\,dF(w)>1,
 \qquad
 \tilde\beta_s
 \doteq
 \frac{\beta\gamma_{ss}}
 {1-\beta\gamma_{ss}(1-\delta)}.
 \]
-At the calibrated value of $\phi$ implied by the 13-month middle-aged unemployment-duration target, this condition fails at $\underline w_s=b$. This is despite the fact that $\tilde\beta_s$ is itself fairly large, reflecting the high values of $\beta$ and $\gamma_{ss}$ together with the relatively low job-destruction rate $\delta$. The corner therefore does not arise because senior employment spells are mechanically worthless; rather, at the calibrated value of $\phi$, the product of search efficiency and expected acceptable-offer surplus is still too small relative to the flow search cost $\psi$. Therefore $a_s^*=0$, and since $\pi(0)=0$, the senior fixed-point equation collapses to $\underline w_s=b$. This corner is not a general feature of the model: if the target duration is shortened enough, the calibrated value of $\phi$ rises, and senior search can become interior. Numerically, this occurs around a 7-month target in the present parametrisation. Thus the zero senior search effort in Table~\ref{tab:rwage_search_effort} should be interpreted as a consequence of the particular calibration target rather than as a mechanical property of the senior problem.
+At the calibrated value of $\phi$ implied by the 13-month middle-aged unemployment-duration target, this condition fails at $\underline w_s=b$. This is despite the fact that $\tilde\beta_s$ is itself fairly large, reflecting the high values of $\beta$ and $\gamma_{ss}$ together with the relatively low job-destruction rate $\delta$. The corner therefore does not arise because senior employment spells are mechanically worthless; rather, at the calibrated value of $\phi$, the product of search efficiency and expected acceptable-offer surplus is still too small relative to the flow search cost $\psi$. Therefore $a_s^*=0$, and since $\pi(0)=0$, the senior fixed-point equation collapses to $\underline w_s=b$. Thus the zero senior search effort in Table~\ref{tab:rwage_search_effort} should be interpreted as a consequence of the particular calibration target rather than as a mechanical property of the senior problem.
 
-\subsection{Unemployment Rates and $G(w)$}
+\subsection{\texorpdfstring{Unemployment Rates and $G(w)$}{Unemployment Rates and G(w)}}
 Table~\ref{tab:unemployment_by_age} reports two related unemployment measures: the unemployment rate within each age cohort, and each cohort's unemployed workers as a share of the total population.
 \begin{table}[!ht]
 \centering
@@ -558,8 +928,8 @@ $s$ & 0.125 & 0.589244 & 0.073655 \\
 Total & 1 & 0.248051 & 0.248051 \\
 \hline
 \end{tabular}
-\caption{Steady-state unemployment proportions by age cohort.}
-\label{tab:unemployment_by_age}
+\caption{Steady-state unemployment rates by age cohort.}
+~\label{tab:unemployment_by_age}
 \end{table}
 The senior cohort has the highest within-cohort unemployment rate, reflecting the corner solution for senior search effort. However, because seniors make up only $12.5\%$ of the population, their contribution to aggregate unemployment is smaller than that of middle-aged workers.
 
@@ -571,18 +941,36 @@ p_{gg'}=\pi(a_g^*)\left[1-F(\underline w_{g'})\right].
 \]
 A cohort has a lower unemployment rate when its workers search more intensely, or when the relevant next-period reservation wage is lower, raising the probability that a wage draw is accepted. Age transitions also matter because unemployed workers may enter the next age cohort before finding a job.
 
-The unemployment rates are not monotone in age: middle-aged workers have a lower unemployment rate than young workers, while seniors have the highest unemployment rate. The high senior unemployment rate reflects their low search effort and, in the calibrated solution, the corner \(a_s^*=0\). The relatively high young unemployment rate has a different source: all new labour-force entrants enter as unemployed young workers. Thus the young cohort receives a direct inflow into unemployment each period from the replacement of retiring seniors. Middle-aged workers do not receive an analogous entry flow, which helps explain why their unemployment rate is lower despite having slightly lower search effort than young workers.
+The unemployment rates are not monotone in age: middle-aged workers have a lower unemployment rate than young workers, while seniors have the highest unemployment rate. The high senior unemployment rate reflects their low search effort and, in the calibrated solution, the corner $a_s^*=0$. The relatively high young unemployment rate has a different source. Although young workers choose the highest search effort, the young unemployment pool is continuously replenished by new labour-force entrants, who enter the model unemployed by assumption. Thus, the higher job-finding probability generated by young workers' search effort is partly offset by the direct inflow of new unemployed young workers. Middle-aged workers do not receive an analogous entry flow, which helps explain why their unemployment rate is lower despite having slightly lower search effort than young workers.
 
-These employment shares also determine the weights in the aggregate accepted-wage distribution $G(w)$ derived in the previous section: each cohort's truncated wage distribution is weighted by its employment mass. Below, we plot both $G(w)$ and $F(w)$ starting at $50$, the truncation point under this parametrisation, representing the lowest reservation wage rate, or, in this specific case, given senior workers are at a corner solution, the benefit rate $b$.
+These employment shares also determine the weights in the aggregate paid-wage distribution $G(w)$ derived in the previous section. Figure~\ref{fig:wage_distribution} plots the calibrated 13-month target distribution together with the offer distribution $F(w)$. In the calibrated equilibrium, the reservation wages are relatively close, with
+\[
+\underline w_s=50,\qquad \underline w_m\approx 55.43,\qquad \underline w_j\approx 56.97.
+\]
+This produces a smooth upward shift of $G(w)$ relative to $F(w)$, but only a mild shoulder in the aggregate paid-wage CDF.
+
 \begin{figure}[!ht]
 \centering
-\includegraphics[width=0.8\textwidth]{\detokenize{MATLAB code/wage_distribution_plot.png}}
-\caption{Offer distribution $F(w)$ and aggregate accepted-wage distribution $G(w)$, plotted from the lowest calibrated reservation wage.}
+\input{wage_distribution_plot.tex}
+\caption{Offer distribution $F(w)$ and aggregate paid-wage distribution $G(w)$ under the calibrated 13-month target.}
 \label{fig:wage_distribution}
 \end{figure}
-As we can see, the accepted-wage distribution $G(w)$ first-order stochastically dominates the offer distribution $F(w)$. This reflects selection into employment: wages are only observed when offers exceed the relevant reservation wage, so accepted wages are drawn from the upper tails of the offer distribution.
+As we can see, the paid-wage distribution $G(w)$ first-order stochastically dominates the offer distribution $F(w)$. This reflects selection into employment: wages are only observed when offers exceed the relevant reservation wage, so accepted wages are drawn from the upper tails of the offer distribution.
 
-As for the shape of the distribution itself, although each cohort-specific accepted-wage distribution is simply a left-truncated version of the offer distribution, the aggregate distribution $G(w)$ is a mixture of these cohort-specific distributions. Since cohorts have different reservation wages, the components of the mixture enter at different wage thresholds. As $w$ crosses each reservation wage, an additional cohort begins contributing to the aggregate distribution. This can generate visible kinks, shoulders, or bumps in $G(w)$, especially when the reservation wages are sufficiently separated or when a cohort has a large employment weight.
+The possibility of shoulders or changes in slope in \(G(w)\) should therefore be interpreted through the stock nature of the paid-wage distribution. The accepted-offer distributions \(A_{gg'}(w)\) are truncated by reservation wages, but the paid-wage distributions \(G_g(w)\) also include wages inherited from earlier age cohorts through surviving employment relationships. Hence, the aggregate distribution \(G(w)\) combines both selection into employment and wage persistence across age transitions. In the present calibration, these forces appear mainly as a mild change in slope rather than a pronounced bump, because the relevant reservation thresholds are fairly close and the inherited wage stock smooths the effect of threshold heterogeneity.
+
+\section{Conclusion and Limitations}
+
+The model highlights how age-dependent horizons shape search effort, reservation wages, unemployment rates, and the distribution of wages paid. Younger and middle-aged workers value accepted offers not only for their immediate wage flow, but also because accepted wages persist into later age cohorts. This continuation channel raises the value of search for workers with longer remaining labour-market horizons. In the calibrated equilibrium, it helps explain why search effort and reservation wages differ across age groups, while the flow equilibrium determines how these individual decisions translate into cohort-specific unemployment rates. It also implies that the distribution of wages paid differs from the underlying offer distribution, because reservation wages select accepted offers from the upper tail and accepted wages remain in the employed stock as workers age.
+
+Several limitations should be kept in mind. First, the model has no firm side. Wages are drawn from an exogenous offer distribution, and workers' search decisions do not affect vacancy creation, wage posting, or congestion in the matching process. As a result, workers do not compete with one another for jobs, and increased search effort by one group does not reduce job-finding opportunities for others. Introducing firms and aggregate matching would make the wage and unemployment distributions jointly determined by both labour supply and labour demand, and could also feed back into equilibrium wages, reservation behaviour, and the shape of the paid-wage distribution through vacancy posting, congestion, and endogenous wage-setting.
+
+Second, unemployment benefits are taken to be the same for all age groups. This is analytically convenient, but it abstracts from age-related differences in savings, eligibility, pensions, household resources, and outside options. Allowing $b$ to vary by age could materially alter reservation wages and search effort, especially for senior workers.
+
+Third, the calibrated corner solution for seniors should be interpreted carefully. In the model, senior unemployed workers may optimally choose zero search effort because the expected value of an acceptable offer is too small relative to the flow cost of search and the shorter expected remaining labour-market horizon. This does not necessarily mean that all older unemployed workers literally stop searching. Rather, it reflects the model's stark margin: search is costly, retirement is near, and there are no additional motives such as savings needs, pension eligibility rules, health shocks, part-time work preferences, or non-pecuniary value from employment. Thus, the senior corner is economically interpretable, but it is also sensitive to the calibration and to the simplified structure of the model.
+
+Overall, the model should therefore be read as a transparent partial-equilibrium account of how ageing, search incentives, and persistent accepted wages interact. Its strength is that it isolates the life-cycle search mechanism clearly; its main limitation is that it abstracts from equilibrium feedback through firms, vacancies, and wage-setting.
+
 
 \appendix
 \section{The Transition Matrix}
@@ -601,7 +989,7 @@ where the first entry in each age pair is employment and the second is unemploym
 \[
 p_{gg'}=\pi(a_g^*)\left[1-F(\underline w_{g'})\right],
 \]
-so \(p_{gg'}\) is the probability that an unemployed worker currently of age \(g\) receives and accepts an offer when next period's age is \(g'\). For each feasible age transition \(g\to g'\), the labour-market transition block is:
+so $p_{gg'}$ is the probability that an unemployed worker currently of age $g$ receives and accepts an offer when next period's age is $g'$. For each feasible age transition $g\to g'$, the labour-market transition block is:
 \[
 L_{gg'}
 =
@@ -610,7 +998,7 @@ L_{gg'}
 p_{gg'} & 1-p_{gg'}
 \end{bmatrix}.
 \]
-For example, if a worker is currently unemployed and moves from \(j\) to \(m\), the relevant job-finding probability is \(p_{jm}\), because the acceptance threshold is the middle-aged reservation wage \(\underline w_m\).
+For example, if a worker is currently unemployed and moves from $j$ to $m$, the relevant job-finding probability is $p_{jm}$, because the acceptance threshold is the middle-aged reservation wage $\underline w_m$.
 
 The age transition component is:
 \[
@@ -635,7 +1023,7 @@ L_{jj} & L_{jm} & \mathbf 0\\
 \mathbf 0 & \mathbf 0 & L_{ss}
 \end{bmatrix}.
 \]
-The Hadamard product \((\Gamma\otimes \mathbf 1_{2\times2})\odot\mathcal L\) applies the appropriate age-transition probability to each feasible labour-market transition. Finally, retiring senior workers are replaced by unemployed young workers. This is captured by:
+The Hadamard product $(\Gamma\otimes \mathbf 1_{2\times2})\odot\mathcal L$ applies the appropriate age-transition probability to each feasible labour-market transition. Finally, retiring senior workers are replaced by unemployed young workers. This is captured by:
 \[
 (1-\gamma_{ss})
 \begin{bmatrix}
@@ -650,8 +1038,7 @@ The Hadamard product \((\Gamma\otimes \mathbf 1_{2\times2})\odot\mathcal L\) app
 Putting these pieces together, the full row-stochastic transition matrix is:
 \[
 \resizebox{\textwidth}{!}{$
-\Pi
-=
+\Pi=
 \begin{bmatrix}
 \gamma_{jj}(1-\delta) & \gamma_{jj}\delta
 & (1-\gamma_{jj})(1-\delta) & (1-\gamma_{jj})\delta
@@ -674,7 +1061,7 @@ Putting these pieces together, the full row-stochastic transition matrix is:
 \end{bmatrix}
 $}.
 \]
-The stationary distribution \(h^*\) is therefore the normalized row vector satisfying:
+The stationary distribution $h^*$ is therefore the normalized row vector satisfying:
 \[
 h^*=h^*\Pi,
 \qquad
@@ -682,187 +1069,175 @@ h^*=h^*\Pi,
 \]
 
 \section{The Choice of Solution Method}
-\subsection{Solving for $\lbar{w}_g$, $\forall g\in\{j,m,s\}$}
-We begin by noting that none of the wage fixed-point equations are contractions. In particular, let:
+\label{app:solution_method}
+
+\subsection{\texorpdfstring{Solving for $\lbar{w}_g$, $\forall g\in\{j,m,s\}$}{Solving for reservation wages}}
+
+We begin by noting that it is inconvenient to rely on contraction mapping arguments to solve the reservation-wage equations. In the senior case, for example, let
 \begin{align*}
 T_s(x)
-=
+&=
 \max_{a_s\geq0}
 \left\{
 b-\psi a_s+
 \tilde\beta_s\pi(a_s)R(x)
 \right\},\\
-R(x)\doteq\sigma\varphi\biggl(\frac{x-\mu}{\sigma}\biggr) + (\mu - x)\Biggl(1 - \Phi\biggl(\frac{x-\mu}{\sigma}\biggr)\Biggr),
-\qquad
-\tilde\beta_s\doteq
+R(x)
+&\doteq
+\int_x^\infty (w-x)\,dF(w)
+=
+\sigma\varphi\biggl(\frac{x-\mu}{\sigma}\biggr)
++
+(\mu-x)
+\Biggl[
+1-\Phi\biggl(\frac{x-\mu}{\sigma}\biggr)
+\Biggr],\\
+\tilde\beta_s
+&\doteq
 \frac{\beta\gamma_{ss}}
 {1-\beta\gamma_{ss}(1-\delta)}.
 \end{align*}
-Where, for any $x,y\in\supp(F)$,
+Since
 \[
-|T_s(x)-T_s(y)|
-\leq
-\tilde\beta_s |R(x)-R(y)|.
+R'(x)=-(1-F(x)),
 \]
-Since $R'(x)=-(1-F(x))$ and $0\leq 1-F(x)\leq1$, the mean value theorem gives
+we have $|R'(x)|\leq 1$, and the mean value theorem gives
 \[
 |R(x)-R(y)|\leq |x-y|.
 \]
-Hence,
+However, the fixed-point mapping scales this surplus term by continuation factors such as $\tilde\beta_s$, which may exceed one. Hence, this bound is not sufficient to establish that the reservation-wage mappings are contractions. We therefore do not rely on Picard iteration of the form:
 \[
-|T_s(x)-T_s(y)|
-\leq
-\tilde\beta_s |x-y|.
+\lbar w_g^{k+1}=T_g(\lbar w_g^k),
 \]
-Therefore, since $\tilde\beta_s>1$, $T_s$ is not a contraction (on $\supp(F)$). A similar logic follows for the remaining two fixed-point equations.
+which would also deliver at best linear convergence when it converges.
 
-Nonetheless, if one still wishes to use solution methods which maintain contractive properties, it remains possible to directly solve from the Bellman equations via VFI. Alternatively, we could pursue an endogenous cut-off formulation to eliminate the computationally-intensive acceptance maximisation and solve the model via value function iteration. However, this approach still requires repeated updates of the value functions and associated integrals, leading to at best linear convergence. By contrast, directly solving the reservation-wage equation via a safeguarded Newton method reduces the problem to a scalar root-finding exercise with quadratic local convergence, and is therefore computationally more efficient.
+One alternative would be to solve the original Bellman equations directly by value function iteration. Another would be to use an endogenous-cutoff formulation, in the spirit of endogenous grid methods, to remove the explicit acceptance maximisation over wage offers. Both approaches are feasible. However, they require repeated updates of value functions and associated expectation terms over the wage distribution, and therefore retain the computational burden of a dynamic-programming iteration. Since the reservation-wage formulation reduces the problem to a sequence of scalar equations, it is more efficient to solve these equations directly.
 
-In practical terms, this amounts to searching for the unique root of:
+For each cohort $g$, define the residual
 \[
-\Psi_g(\lbar{w}_g)=\lbar{w}_g-T_g(\lbar{w}_g).
+\Psi_g(\lbar{w}_g)
+\doteq
+\lbar{w}_g-T_g(\lbar{w}_g),
 \]
-Taking a starting interval, for instance \((b,\mu+2\sigma)\), and verifying that the sign does indeed change over this interval, we maintain a bracketing interval \([a_k,b_k]\) such that
+where $T_g$ denotes the right-hand side of the corresponding reservation-wage fixed-point equation after substituting the optimal search policy. Thus, computing the reservation wage amounts to finding a root of:
 \[
-\Psi_g(a_k)\Psi_g(b_k)<0
+\Psi_g(\lbar{w}_g)=0.
 \]
-at each iteration.
 
-At a given iterate \(x_k\in[a_k,b_k]\), the method first computes the Newton candidate:
+In practical terms, we begin with an economically motivated initial interval, such as one spanning the unemployment benefit and the upper tail of the wage distribution. If the residual does not change sign over this interval, we expand the bracket geometrically until we obtain endpoints $a_k$ and $b_k$ satisfying:
 \[
-x_{k+1}^{N}
+\Psi_g(a_k)\Psi_g(b_k)<0.
+\]
+This ensures that the root is bracketed before applying the root-finding algorithm.
+
+We solve the scalar residual equation using MATLAB's \texttt{fzero}, a Brent-type bracketing method. The method combines the global robustness of bisection with faster interpolation steps, such as the secant method and inverse quadratic interpolation. The bisection component preserves the sign-changing bracket, while the interpolation steps exploit local information about the residual when it is sufficiently regular.
+
+At each iteration, the algorithm attempts an interpolation step when the available residual evaluations make this possible. With two suitable points, this may take the form of a secant step; with three suitable points and distinct residual values, it may take the form of inverse quadratic interpolation. If the proposed interpolation step fails the safeguard conditions, the algorithm falls back to bisection.
+
+In the secant case, two previous residual evaluations (initially, the upper and lower bound of the bracket) are used to approximate the slope of $\Psi_g$. Given two distinct iterates $x_{k-1}$ and $x_k$, the proposed secant update is:
+\[
+x_{k+1}^{S}
 =
-x_k-\frac{\Psi_g(x_k)}{\Psi_g'(x_k)}.
+x_k
+-
+\Psi_g(x_k)
+\frac{x_k-x_{k-1}}
+{\Psi_g(x_k)-\Psi_g(x_{k-1})}.
 \]
-If this Newton candidate remains inside the current bracket and delivers sufficient progress (e.g. reduces the residual or lies sufficiently close to the current iterate), we accept it:
+When three distinct residual evaluations are available, the method may instead use inverse quadratic interpolation. Let:
 \[
-x_{k+1}=x_{k+1}^{N}.
+y_i\doteq \Psi_g(x_i), \qquad i\in\{0,1,2\}.
 \]
-Otherwise, we reject the Newton step and instead take the bisection update:
+The method fits a quadratic approximation to the inverse map $x=x(y)$ through the three points $(y_i,x_i)$ and evaluates this approximation at $y=0$. In Lagrange form, the proposed inverse-quadratic update is:
+\[
+x_{k+1}^{Q}
+=
+x_0
+\frac{(0-y_1)(0-y_2)}{(y_0-y_1)(y_0-y_2)}
++
+x_1
+\frac{(0-y_0)(0-y_2)}{(y_1-y_0)(y_1-y_2)}
++
+x_2
+\frac{(0-y_0)(0-y_1)}{(y_2-y_0)(y_2-y_1)}.
+\]
+This update approximates the inverse relationship between the residual and the candidate root. Rather than fitting a quadratic to $\Psi_g(x)$ directly, the method fits a quadratic to $x$ as a function of $y=\Psi_g(x)$, and then asks which value of $x$ would make the fitted residual equal to zero. Hence, evaluating the inverse quadratic at $y=0$ gives the next candidate root.
+
+The interpolation step is accepted only if it remains inside the current bracket and satisfies the method's safeguard conditions. Otherwise, the algorithm falls back to the bisection update:
 \[
 x_{k+1}
 =
 \frac{a_k+b_k}{2}.
 \]
-After evaluating \(\Psi_g(x_{k+1})\), the bracket is updated according to the sign of the residual:
+After evaluating $\Psi_g(x_{k+1})$, the bracket is updated according to the sign of the residual, preserving:
 \[
-[a_{k+1},b_{k+1}]
-=
-\begin{cases}
-[x_{k+1},b_k],
-& \text{if } \Psi_g(x_{k+1})\Psi_g(a_k)>0,\\
-[a_k,x_{k+1}],
-& \text{if } \Psi_g(x_{k+1})\Psi_g(a_k)<0.
-\end{cases}
+\Psi_g(a_{k+1})\Psi_g(b_{k+1})<0.
 \]
 This guarantees that the root remains bracketed throughout the iteration.
 
-The reason this method is particularly well suited to the present problem is that \(\Psi_g'(\cdot)\) can be computed analytically. Hence, when the current iterate is sufficiently close to the root and \(\Psi_g'(\lbar{w}_g)\neq 0\), the Newton step inherits the usual local convergence properties of Newton-Raphson. To see this, a Taylor expansion around the true root \(\lbar{w}_g^*\) gives:
+This hybrid strategy is well suited to the present problem. Secant-type updates converge superlinearly under standard smoothness conditions, and inverse quadratic interpolation has even faster superlinear local convergence when the residual is sufficiently regular. Thus, when the iterates are near a smooth root, the method can be substantially faster than pure bisection. At the same time, because the algorithm falls back to bisection whenever interpolation becomes unreliable, it remains robust near kinks or poorly behaved regions of the residual.
+
+This robustness matters because the optimal search policy contains a corner,
 \[
-0
-=
-\Psi_g(\lbar{w}_g^*)
-=
-\Psi_g(x_k)
-+
-\Psi_g'(x_k)(\lbar{w}_g^*-x_k)
-+
-O\bigl((\lbar{w}_g^*-x_k)^2\bigr),
+a_g^*=\max\{0,\cdots\}.
 \]
-so that the Newton update eliminates the first-order error term. Consequently, once the iterates enter a neighbourhood of the root, convergence is quadratic under the usual regularity conditions. Away from the root, the bisection safeguard preserves global robustness by preventing the algorithm from leaving the bracketing interval.
+Consequently, the residual $\Psi_g(\cdot)$ is continuous under the maintained assumptions, but may fail to be differentiable at the point where search effort switches between zero and positive values. A Brent-type method only requires function evaluations and a sign-changing bracket, and therefore avoids differentiating through this corner.\footnote{A safeguarded Newton-Raphson method would instead propose
+\[
+x_{k+1}^{N}
+=
+x_k-\frac{\Psi_g(x_k)}{\Psi_g'(x_k)}.
+\]
+This can deliver quadratic local convergence when $\Psi_g$ is smooth and $\Psi_g'$ is well behaved. In the present setting, however, the search policy contains the corner $a_g^*=\max\{0,\cdots\}$, so the residual may be nonsmooth at the point where search effort switches between zero and positive values. A derivative-based method must therefore account for these regimes explicitly. A derivative-free Brent-type method avoids this complication while preserving a sign-changing bracket.}
 
-This hybrid strategy therefore combines the reliability of bisection with the speed of Newton-Raphson. Since \(\Psi_g(\cdot)\) is continuous and strictly increasing, the maintained bracket contains a unique root, while the safeguarded Newton updates provide an efficient and reliable method for computing the reservation wage for each cohort. This is also why we do not use Picard iteration for the reservation-wage equations. Iterating \(\underline w_g^{k+1}=T_g(\underline w_g^k)\) would deliver at best linear convergence when it converges, while the wage equations have analytical derivatives that allow the safeguarded Newton step to obtain quadratic local convergence.
+\subsection{\texorpdfstring{Solving for $\phi$}{Solving for phi}}
+\label{app:calibration_phi}
 
-\subsection{Solving for $\phi$}
 For the outer calibration, define the residual:
 \[
 \Omega(\phi)
 \doteq
-\frac{1}{
-\gamma_{mm}\pi(a_m^*(\phi),\phi)
-\left[1-F(\underline w_m(\phi))\right]
-+(1-\gamma_{mm})
-}
+\frac{1}{\gamma_{mm}p_{mm}+(1-\gamma_{mm})}
 -13.
 \]
-The calibrated value of \(\phi\) solves \(\Omega(\phi)=0\).
+The calibrated value of $\phi$ solves:
+\[
+\Omega(\phi)=0.
+\]
 
-We solve for \(\phi\) using \texttt{fzero}, native to \texttt{MATLAB}. This routine implements a Brent-type method, combining bisection with interpolation steps such as the secant method and inverse quadratic interpolation. We choose a bracketing interval \([\phi_L,\phi_H]\) such that \(\Omega(\phi_L)\Omega(\phi_H)<0\). The bisection component preserves the bracketing of the root, while the interpolation steps typically accelerate convergence relative to pure bisection.
+This residual is scalar, but it is less convenient to differentiate than the reservation-wage residuals. For each candidate value of $\phi$, the reservation wages $\underline w_s(\phi)$ and $\underline w_m(\phi)$ are themselves obtained by solving nested nonlinear equations, and the search policies contain the corner:
+\[
+a_g^*=\max\{0,\cdots\}.
+\]
+Thus, $\Omega(\phi)$ may be a priori nonsmooth at values of $\phi$ where a cohort switches between zero and positive search effort. For this reason, we again use a Brent-type bracketing method, implemented through MATLAB's \texttt{fzero}. The method only requires evaluations of $\Omega(\phi)$ and a sign-changing bracket, while retaining the robustness of bisection and the faster local convergence of secant or inverse-quadratic interpolation steps when these are reliable.
 
-In the secant case, given two previous residual evaluations at distinct values of \(\phi\), the proposed update is:
+We choose a bracket $[\phi_L,\phi_H]$ satisfying
 \[
-\phi_{k+1}^{S}
-=
-\phi_k
--
-\Omega(\phi_k)
-\frac{\phi_k-\phi_{k-1}}{\Omega(\phi_k)-\Omega(\phi_{k-1})}.
+\Omega(\phi_L)\Omega(\phi_H)<0.
 \]
-When three previous residual evaluations are available at distinct values of \(\phi\), and their residual values are also distinct, the method may instead employ inverse quadratic interpolation. Let:
-\[
-y_i\doteq \Omega(\phi_i),
-\qquad i\in\{0,1,2\}.
-\]
-The method fits a quadratic approximation to the inverse map \(\phi=\phi(y)\) through the three points \((y_i,\phi_i)\), and evaluates this approximation at \(y=0\). Using the Lagrange form of the interpolating polynomial, the proposed inverse-quadratic update is:
-\[
-\phi_{k+1}^{Q}
-=
-\phi_0
-\frac{(0-y_1)(0-y_2)}{(y_0-y_1)(y_0-y_2)}
-+
-\phi_1
-\frac{(0-y_0)(0-y_2)}{(y_1-y_0)(y_1-y_2)}
-+
-\phi_2
-\frac{(0-y_0)(0-y_1)}{(y_2-y_0)(y_2-y_1)}.
-\]
-Equivalently, this is the value of \(\phi\) implied by the fitted inverse quadratic when the residual is zero. This yields a higher-order approximation to the root without requiring a derivative of \(\Omega(\phi)\).
-
-The interpolation step is not accepted automatically. Brent-type methods use an interpolation step only when the required distinct function values are available and the proposed point satisfies safeguard conditions: it must remain inside the current bracket and deliver sufficient progress relative to a bisection step. If these conditions fail, the method falls back to bisection:
-\[
-\phi_{k+1}=\frac{\phi_L+\phi_H}{2},
-\]
-thereby preserving the bracketing condition at all times.
-
-A natural alternative would be to rewrite the calibration equation as a fixed-point problem, \(\phi=G(\phi)\), and use Picard iteration:
-\[
-\phi_{k+1}=G(\phi_k).
-\]
-However, even when this iteration converges, its convergence is generally only linear. To see this, suppose \(\phi^*=G(\phi^*)\) and \(G\) is differentiable in a neighbourhood of \(\phi^*\). A first-order Taylor expansion gives:
-\[
-\phi_{k+1}-\phi^*
-=
-G'(\phi^*)(\phi_k-\phi^*)+O\left((\phi_k-\phi^*)^2\right).
-\]
-Thus, unless \(G'(\phi^*)=0\), the error shrinks only proportionally to the previous error. By contrast, a Brent-type method keeps the robustness of bisection but can exploit secant or inverse-quadratic interpolation steps when these are reliable. Under the usual smoothness conditions, secant-type updates converge superlinearly, while inverse quadratic interpolation has an asymptotic order above linear as well. These interpolation steps use local information about \(\Omega(\phi)\) to jump closer to the root, which is why \texttt{fzero} is typically faster than Picard iteration for a scalar calibration equation, while still falling back to bisection when the interpolation step is unsafe.
-
-This hybrid strategy combines the global robustness of bisection with the faster local convergence of interpolation-based methods. While safeguarded Newton-Raphson is effective for the reservation-wage equations due to the availability of analytical derivatives, applying Newton-Raphson to the outer calibration problem is less attractive. The residual \(\Omega(\phi)\) depends on \(a_m^*(\phi)\), \(\underline w_m(\phi)\), and \(\underline w_s(\phi)\), where the reservation wages are themselves obtained by solving nonlinear equations for each candidate value of \(\phi\). Moreover, optimal search effort is defined by a corner condition,
-\[
-a_g^*=\max\{0,\cdots\},
-\]
-so the derivative of the outer residual is piecewise and may be nonsmooth at values of \(\phi\) where the search-effort constraint binds or ceases to bind. Differentiating \(\Omega(\phi)\) is therefore possible in principle, but would require differentiating through the nested equilibrium solver while accounting for these corner regimes. MATLAB's \texttt{fzero} avoids this additional complexity because it only requires evaluations of \(\Omega(\phi)\), while its bisection safeguard preserves the root bracket even when interpolation steps are unreliable.
-
-By contrast, for the reservation-wage equations we use safeguarded Newton-Raphson because the relevant derivatives are available analytically from the envelope theorem. Inverse quadratic interpolation is most useful when these derivatives are unavailable or inconvenient to compute; using it for the inner problem would therefore add little relative to Newton's quadratic local convergence.
+The lower endpoint is taken to be a small `error' value above $0$, since $\phi=0$ makes the closed-form search-effort rules ill-defined. The upper endpoint is obtained by geometric expansion until the residual changes sign. Once this bracket is found, \texttt{fzero} is applied to solve for the calibrated value of $\phi$.
 
 \subsection{Numerical Check of the Calibration Residual}
+\label{app:calibration_residual_check}
 
-Since the calibration residual depends on recursively solved reservation wages and piecewise-defined search efforts, we do not provide an analytic proof of global uniqueness for the root in \(\phi\). Instead, we numerically evaluate \(\Omega(\phi)\) over a wide grid of positive values of \(\phi\). Figure~\ref{fig:calibration_residual} plots the resulting residual. For small values of \(\phi\), search is effectively inactive, so the exit probability from middle-aged unemployment is close to the aging probability \(1-\gamma_{mm}\). The implied duration is therefore close to:
+Since the calibration residual depends on recursively solved reservation wages and piecewise-defined search efforts, we do not provide an analytic proof of global uniqueness for the root in $\phi$. Instead, we numerically evaluate $\Omega(\phi)$ over a wide grid of positive values of $\phi$. Figure~\ref{fig:calibration_residual} plots the resulting residual. For small values of $\phi$, search is effectively inactive, so the exit probability from middle-aged unemployment is close to the aging probability $1-\gamma_{mm}$. The implied duration is therefore close to:
 \[
 \frac{1}{1-\gamma_{mm}}=300
 \]
-months, giving the high plateau on the left of the plot. As \(\phi\) increases, middle-aged search becomes productive and the residual falls sharply through zero. For larger values of \(\phi\), the residual remains negative and flattens, reflecting the endogenous adjustment of search effort and reservation wages as search efficiency rises. Hence, over the grid considered, the residual is positive on the low-\(\phi\) plateau, crosses zero once during the sharp transition, and remains negative thereafter. This provides numerical evidence for a unique calibrated root on the relevant search interval and motivates the bracketing interval used by \texttt{fzero}.
+months, giving the high plateau on the left of the plot. As $\phi$ increases, middle-aged search becomes productive and the residual falls sharply through zero. For larger values of $\phi$, the residual remains negative and flattens, reflecting the endogenous adjustment of search effort and reservation wages as search efficiency rises. Hence, over the grid considered, the residual is positive on the low-$\phi$ plateau, crosses zero once during the sharp transition, and remains negative thereafter. This provides numerical evidence for a unique calibrated root on the relevant search interval and motivates the bracketing interval used by \texttt{fzero}.
 
 \begin{figure}[!ht]
 \centering
-\includegraphics[width=0.8\textwidth]{\detokenize{MATLAB code/calibration_residual_plot.png}}
-\caption{Calibration residual \(\Omega(\phi)\) over a log-spaced grid of values for \(\phi\).}
+\input{calibration_residual_plot.tex}
+\caption{Calibration residual $\Omega(\phi)$ over a log-spaced grid of values for $\phi$.}
 \label{fig:calibration_residual}
 \end{figure}
 
-\section{Simplifying $T_g(\lbar{w}_g\in\{j,m\})$ for the Solver}
-While $R(x)$ remains an integral that lends itself well to the \texttt{MATLAB} normal pdf and cdf functions, the remaining integrals in the middle-aged and young reservation wage equations can do with more simplification, so as to prevent the evaluation of ad hoc integrals and save on computational power.
+\section{\texorpdfstring{Simplifying $T_g(\lbar{w}_g\in\{j,m\})$ for the Solver}{Simplifying T_g for the Solver}}
+\label{app:solver_simplification}
+While $R(x)$ remains an integral that lends itself well to the \texttt{MATLAB} normal pdf and cdf functions, the remaining integrals in the middle-aged and young reservation wage equations can be simplified further. This is useful both for exposition and for the MATLAB implementation, because it avoids the repeated evaluation of ad hoc integrals inside the numerical solver.
 
 \subsection{Evaluation of the Middle-Aged Surplus Integral}
+\label{app:middle_surplus}
 
 For the numerical implementation, it is useful to simplify the integral appearing in the middle-aged reservation-wage equation:
 \[
@@ -889,8 +1264,8 @@ w+\beta\gamma_{ss}\delta V_{u,s}
 \]
 In effect, $V_{e,s}(w)$ is affine in $w$, and therefore so is
 $\tilde{V}_s(w)$.
-\smallskip\\
-\noindent From here, let us define $\tilde{V}_s(w)$ in terms of $A_s$ and $B_s$:
+\par\smallskip
+\noindent We now derive the closed-form representation for the coefficient $B_s$ used in the main text by writing $\tilde{V}_s(w)$ in affine form:
 \[
 \tilde V_s(w)=A_s+B_s w,
 \]
@@ -913,9 +1288,9 @@ V_{u,s}
 =
 \frac{\underline w_s}{1-\beta\gamma_{ss}},
 \]
-hence both \(A_s\) and \(B_s\) are known once \(\underline w_s\) has been solved.
-\smallskip\\
-\noindent Substituting \(\tilde V_s(w)=A_s+B_s w\) into \(I_m(x)\), we obtain:
+hence both $A_s$ and $B_s$ are known once $\underline w_s$ has been solved.
+\par\smallskip
+\noindent Substituting $\tilde V_s(w)=A_s+B_s w$ into $I_m(x)$, we obtain:
 \begin{align*}
 I_m(x)
 &=
@@ -943,6 +1318,7 @@ I_m(x)
 Thus, the middle-aged surplus integral does not require numerical quadrature. Since $\tilde V_s(\cdot)$ is affine in the wage, the integral can be evaluated directly from the same truncated-surplus function $R(x)$ used in the senior problem.
 
 \subsection{Evaluation of the Young Surplus Integral}
+\label{app:young_surplus}
 
 The young worker's reservation-wage equation can be simplified in the same way. Define:
 \[
@@ -974,7 +1350,7 @@ w+\beta\gamma_{mm}\delta V_{u,m}+\tilde V_s(w)
 1-\beta\gamma_{mm}(1-\delta)
 },
 \]
-and $\tilde V_s(w)=A_s+B_s w$, it follows that $V_{e,m}(w)$ is affine in $w$. Consequently:
+and $\tilde V_s(w)=A_s+B_s w$, it follows that $V_{e,m}(w)$ is affine in $w$. Consequently, this yields the closed-form representation for the coefficient $B_m$ used in the main text:
 \[
 \tilde V_m(w)
 \doteq
