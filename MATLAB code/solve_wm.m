@@ -38,8 +38,6 @@ function [w_m, a_m] = solve_wm(phi, par, obj, w_s)
         + obj.pi(a_m_star(x), phi) .* gain_m(x);
 
     Psi_m = @(x) x - T_m(x);
-    dGain_m = @(x) -beta_tilde_m .* (1 + B_s) .* (1 - obj.F(x));
-    dPsi_m = @(x) 1 + B_s - obj.pi(a_m_star(x), phi) .* dGain_m(x);
 
     %% checking the bracket
 
@@ -64,45 +62,9 @@ function [w_m, a_m] = solve_wm(phi, par, obj, w_s)
             'Initial bracket does not contain a sign change.');
     end
 
-    %% Safeguarded Newton-Raphson solver
+    %% Bracketed fzero solver
 
-    tol = 1e-10;
-    max_iter = 200;
-    w_m = 0.5 * (wL + wH);
-
-    for iter = 1:max_iter
-        f = Psi_m(w_m);
-
-        if abs(f) < tol || (wH - wL) < tol
-            break;
-        end
-
-        df = dPsi_m(w_m);
-        w_newton = w_m - f ./ df;
-
-        if isfinite(w_newton) && w_newton > wL && w_newton < wH
-            w_next = w_newton;
-        else
-            w_next = 0.5 * (wL + wH);
-        end
-
-        f_next = Psi_m(w_next);
-
-        if fL * f_next <= 0
-            wH = w_next;
-            fH = f_next;
-        else
-            wL = w_next;
-            fL = f_next;
-        end
-
-        w_m = w_next;
-    end
-
-    if iter == max_iter && abs(Psi_m(w_m)) >= tol
-        error('solve_wm:noConvergence', ...
-            'Safeguarded Newton did not converge.');
-    end
+    w_m = fzero(Psi_m, [wL, wH]);
 
     a_m = a_m_star(w_m);
 end

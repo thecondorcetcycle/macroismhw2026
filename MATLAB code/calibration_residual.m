@@ -1,5 +1,6 @@
 function [Omega, sol] = calibration_residual(phi, par, obj, target_duration)
 
+    % Setting default value of target
     if nargin < 4
         target_duration = 13;
     end

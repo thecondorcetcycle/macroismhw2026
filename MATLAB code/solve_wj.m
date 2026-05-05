@@ -42,8 +42,6 @@ function [w_j, a_j] = solve_wj(phi, par, obj, w_s, w_m)
         + obj.pi(a_j_star(x), phi) .* gain_j(x);
 
     Psi_j = @(x) x - T_j(x);
-    dGain_j = @(x) -beta_tilde_j .* (1 + B_m) .* (1 - obj.F(x));
-    dPsi_j = @(x) 1 + B_m - obj.pi(a_j_star(x), phi) .* dGain_j(x);
 
     %% Bracket
 
@@ -68,45 +66,9 @@ function [w_j, a_j] = solve_wj(phi, par, obj, w_s, w_m)
             'Initial bracket does not contain a sign change.');
     end
 
-    %% Safeguarded Newton-Raphson solver
+    %% Bracketed fzero solver
 
-    tol = 1e-10;
-    max_iter = 200;
-    w_j = 0.5 * (wL + wH);
-
-    for iter = 1:max_iter
-        f = Psi_j(w_j);
-
-        if abs(f) < tol || (wH - wL) < tol
-            break;
-        end
-
-        df = dPsi_j(w_j);
-        w_newton = w_j - f ./ df;
-
-        if isfinite(w_newton) && w_newton > wL && w_newton < wH
-            w_next = w_newton;
-        else
-            w_next = 0.5 * (wL + wH);
-        end
-
-        f_next = Psi_j(w_next);
-
-        if fL * f_next <= 0
-            wH = w_next;
-            fH = f_next;
-        else
-            wL = w_next;
-            fL = f_next;
-        end
-
-        w_j = w_next;
-    end
-
-    if iter == max_iter && abs(Psi_j(w_j)) >= tol
-        error('solve_wj:noConvergence', ...
-            'Safeguarded Newton did not converge.');
-    end
+    w_j = fzero(Psi_j, [wL, wH]);
 
     a_j = a_j_star(w_j);
 end
